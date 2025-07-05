@@ -33,8 +33,8 @@
         }
         
         .container {
-            max-width: 400px;
-            margin: 0 auto;
+            max-width: 300px;
+            margin: 5 auto;
             background-color: white;
             border-radius: 15px;
             box-shadow: 0 15px 40px rgba(0, 0, 0, 0.18);
