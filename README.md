@@ -453,6 +453,10 @@
                 </div>
                 
                 <p>تم إرسال الطلب إلى البريد الإلكتروني: alimahmoud001a@gmail.com</p>
+                
+                <div class="btn-container">
+                    <button id="sendEmail">إرسال الطلب عبر البريد</button>
+                </div>
             </div>
             
             <div class="btn-container">
@@ -478,6 +482,7 @@
         const completeBuy = document.getElementById('completeBuy');
         const completeSell = document.getElementById('completeSell');
         const newOrder = document.getElementById('newOrder');
+        const sendEmail = document.getElementById('sendEmail');
         
         // تفاصيل الشراء
         const buyMethod = document.getElementById('buyMethod');
@@ -586,6 +591,13 @@
             step1.classList.add('active');
         });
         
+        sendEmail.addEventListener('click', () => {
+            const subject = "طلب تحويل USDT جديد";
+            const body = createEmailBody();
+            const mailtoLink = `mailto:alimahmoud001a@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+            window.location.href = mailtoLink;
+        });
+        
         // عرض تفاصيل الدفع للشراء
         buyMethod.addEventListener('change', () => {
             const method = buyMethod.value;
@@ -639,7 +651,7 @@
         function validateBuyForm() {
             const amount = buyAmount.value;
             const network = buyNetwork.value;
-            const address = buyAddress.value;
+            const address = document.getElementById('buyAddress').value;
             const method = buyMethod.value;
             
             if (!amount || amount <= 0 || !network || !address || !method) {
@@ -809,6 +821,34 @@
                 summaryMethod.textContent = method;
                 summaryNetAmount.textContent = netAmount.toFixed(2) + ' USDT';
             }
+        }
+        
+        // إنشاء محتوى البريد الإلكتروني
+        function createEmailBody() {
+            const name = document.getElementById('fullName').value;
+            const phone = document.getElementById('phone').value;
+            const city = document.getElementById('city').value;
+            const type = summaryType.textContent;
+            const amount = summaryAmount.textContent;
+            const commission = summaryCommission.textContent;
+            const network = summaryNetwork.textContent;
+            const method = summaryMethod.textContent;
+            const netAmount = summaryNetAmount.textContent;
+            
+            return `طلب تحويل USDT جديد
+            
+الاسم: ${name}
+الهاتف: ${phone}
+المدينة: ${city}
+نوع العملية: ${type}
+الكمية: ${amount}
+العمولة: ${commission}
+الشبكة: ${network}
+طريقة الدفع/الاستلام: ${method}
+المبلغ الصافي: ${netAmount}
+
+تم إرسال هذا الطلب من نظام تحويل USDT في سورية
+`;
         }
         
         // إعادة تعيين النموذج
