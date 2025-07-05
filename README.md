@@ -52,7 +52,7 @@
         header h1 {
             font-size: 2.1rem;
             margin-bottom: 12px;
-            font-weight: 800; /* زيادة سمك خط العنوان */
+            font-weight: 300; /* زيادة سمك خط العنوان */
             letter-spacing: -0.5px;
             text-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
