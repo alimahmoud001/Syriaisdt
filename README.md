@@ -645,7 +645,7 @@
         function calculateFees(amount, network) {
             let transactionFee;
             
-            if (amount < 100) {
+            if (amount =< 100) {
                 transactionFee = 1.65;
             } else if (amount <= 5000) {
                 transactionFee = amount * 0.01;
