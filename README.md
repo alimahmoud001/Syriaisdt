@@ -430,8 +430,8 @@
                 font-size: 1.1rem;
             }
         }
-        ---
-        media (max-width: 767px) {
+    
+        @media (max-width: 767px) {
       .header {
         flex-direction: column;
         text-align: center;
@@ -453,38 +453,7 @@
       .sidebar {
         margin-top: 20px;
       }
-        ---
-        @media (max-width: 480px) {
-            body {
-                padding: 10px;
-            }
-            
-            header {
-                padding: 20px 15px;
-            }
-            
-            header h1 {
-                font-size: 1.6rem;
-            }
-            
-            .logo i {
-                width: 65px;
-                height: 65px;
-                font-size: 2.5rem;
-            }
-            
-            .form-container {
-                padding: 15px;
-            }
-            
-            .section-title {
-                font-size: 1.25rem;
-            }
-            
-            .copy-btn {
-                padding: 8px 12px;
-                font-size: 0.9rem;
-            }
+        
         }
     </style>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;600;700;800&display=swap" rel="stylesheet">
