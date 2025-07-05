@@ -33,8 +33,8 @@
         }
         
         .container {
-            max-width: 300px;
-            margin: 5 auto;
+            max-width: 800px;
+            margin: 0 auto;
             background-color: white;
             border-radius: 15px;
             box-shadow: 0 15px 40px rgba(0, 0, 0, 0.18);
@@ -430,7 +430,30 @@
                 font-size: 1.1rem;
             }
         }
-        
+        ---
+        media (max-width: 767px) {
+      .header {
+        flex-direction: column;
+        text-align: center;
+      }
+      
+      .menu {
+        flex-direction: column;
+        margin-top: 15px;
+      }
+      
+      .menu li {
+        margin: 5px 0;
+      }
+      
+      .content {
+        flex-direction: column;
+      }
+      
+      .sidebar {
+        margin-top: 20px;
+      }
+        ---
         @media (max-width: 480px) {
             body {
                 padding: 10px;
