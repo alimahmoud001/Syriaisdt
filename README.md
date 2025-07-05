@@ -396,7 +396,7 @@
             to { opacity: 1; transform: translateY(0); }
         }
         
-        @media (max-width: 768px) {
+        @media (max-width: 400px) {
             .radio-group {
                 flex-direction: column;
             }
@@ -431,29 +431,38 @@
             }
         }
     
-        @media (max-width: 767px) {
-      .header {
-        flex-direction: column;
-        text-align: center;
-      }
-      
-      .menu {
-        flex-direction: column;
-        margin-top: 15px;
-      }
-      
-      .menu li {
-        margin: 5px 0;
-      }
-      
-      .content {
-        flex-direction: column;
-      }
-      
-      .sidebar {
-        margin-top: 20px;
-      }
         
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+            
+            header {
+                padding: 20px 15px;
+            }
+            
+            header h1 {
+                font-size: 1.6rem;
+            }
+            
+            .logo i {
+                width: 65px;
+                height: 65px;
+                font-size: 2.5rem;
+            }
+            
+            .form-container {
+                padding: 15px;
+            }
+            
+            .section-title {
+                font-size: 1.25rem;
+            }
+            
+            .copy-btn {
+                padding: 8px 12px;
+                font-size: 0.9rem;
+            }
         }
     </style>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;600;700;800&display=swap" rel="stylesheet">
