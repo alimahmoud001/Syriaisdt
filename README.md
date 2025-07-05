@@ -33,7 +33,7 @@
         }
         
         .container {
-            max-width: 800px;
+            max-width: 400px;
             margin: 0 auto;
             background-color: white;
             border-radius: 15px;
