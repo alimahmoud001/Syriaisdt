@@ -728,7 +728,7 @@
     
     <script>
         // Constants
-        const EXCHANGE_RATE = 10000; // SYP per USD
+        const EXCHANGE_RATE = 9850; // SYP per USD
         const NETWORK_FEES = {
             'bep20': 0.15,
             'trc20': 2,
