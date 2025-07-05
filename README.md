@@ -3,438 +3,556 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تحويل العملات الرقمية (USDT)</title>
+    <title>تحويل عملات رقمية USDT</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            max-width: 800px;
-            margin: 20px auto;
-            padding: 20px;
+            font-family: 'Arial', sans-serif;
             background-color: #f4f4f4;
-            direction: rtl;
-        }
-        h1, h2, h3 {
-            text-align: center;
             color: #333;
+            line-height: 1.6;
+            margin: 20px;
         }
-        .form-section {
-            background: white;
-            padding: 20px;
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: #fff;
+            padding: 30px;
             border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1, h2 {
+            color: #0056b3;
+            text-align: center;
             margin-bottom: 20px;
         }
         label {
             display: block;
-            margin: 10px 0 5px;
+            margin-bottom: 8px;
             font-weight: bold;
         }
-        input, select, textarea {
-            width: 100%;
+        input[type="text"],
+        input[type="tel"],
+        input[type="number"],
+        textarea,
+        select {
+            width: calc(100% - 22px);
             padding: 10px;
-            margin-bottom: 10px;
-            border: 1px solid #ccc;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
             border-radius: 4px;
             box-sizing: border-box;
         }
+        input[type="radio"] {
+            margin-left: 10px;
+            margin-bottom: 15px;
+        }
+        .radio-group label {
+            display: inline-block;
+            margin-right: 20px;
+        }
         button {
-            background-color: #28a745;
+            background-color: #007bff;
             color: white;
-            padding: 10px 20px;
+            padding: 12px 20px;
             border: none;
             border-radius: 4px;
             cursor: pointer;
-            display: block;
-            margin: 20px auto;
+            font-size: 16px;
+            width: 100%;
+            transition: background-color 0.3s ease;
         }
         button:hover {
-            background-color: #218838;
+            background-color: #0056b3;
         }
-        #result {
-            margin-top: 20px;
-            padding: 15px;
-            background: #e9ecef;
-            border-radius: 4px;
-            display: none;
+        .section {
+            background-color: #e9f7ff;
+            border-left: 5px solid #007bff;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 5px;
         }
         .hidden {
             display: none;
         }
+        .result-section {
+            background-color: #d4edda;
+            color: #155724;
+            padding: 20px;
+            border-radius: 5px;
+            margin-top: 20px;
+            border: 1px solid #c3e6cb;
+            display: none; /* Hidden by default */
+        }
+        .result-section h3 {
+            color: #155724;
+        }
+        .error-message {
+            color: red;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .note {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 20px;
+            padding-top: 10px;
+            border-top: 1px dashed #ccc;
+        }
     </style>
 </head>
 <body>
-    <h1>تحويل العملات الرقمية (USDT)</h1>
 
-    <!-- User Information Section -->
-    <div class="form-section">
-        <h2>معلومات المستخدم</h2>
-        <label for="fullName">الاسم الثلاثي:</label>
-        <input type="text" id="fullName" required>
+    <div class="container">
+        <h1>خدمة تحويل العملات الرقمية</h1>
+        <form id="cryptoForm">
+            <div class="section">
+                <h2>الخطوة الأولى: معلوماتك الشخصية</h2>
+                <label for="fullName">الاسم الثلاثي:</label>
+                <input type="text" id="fullName" name="fullName" required>
 
-        <label for="phoneNumber">رقم الهاتف:</label>
-        <input type="text" id="phoneNumber" required>
+                <label for="phone">رقم الهاتف:</label>
+                <input type="tel" id="phone" name="phone" required>
 
-        <label for="city">المدينة:</label>
-        <input type="text" id="city" required>
+                <label for="city">المدينة:</label>
+                <input type="text" id="city" name="city" required>
+            </div>
+
+            <div class="section">
+                <h2>الخطوة الثانية: نوع العملية</h2>
+                <label>ماذا تريد؟</label>
+                <div class="radio-group">
+                    <input type="radio" id="buy" name="transactionType" value="buy" required>
+                    <label for="buy">شراء USDT</label>
+                    <input type="radio" id="sell" name="transactionType" value="sell">
+                    <label for="sell">بيع USDT</label>
+                </div>
+            </div>
+
+            <div id="buySection" class="section hidden">
+                <h2>شراء USDT</h2>
+                <label for="buyAmount">الكمية المطلوبة (USDT):</label>
+                <input type="number" id="buyAmount" name="buyAmount" min="1" step="0.01">
+                <p class="error-message" id="buyAmountError"></p>
+
+                <label for="buyNetwork">اختر الشبكة:</label>
+                <select id="buyNetwork" name="buyNetwork">
+                    <option value="">اختر شبكة</option>
+                    <option value="bep20">BEP20</option>
+                    <option value="trc20">TRC20</option>
+                    <option value="erc20">ERC20</option>
+                    <option value="binance_pay">Binance Pay</option>
+                </select>
+
+                <label for="buyAddress">عنوان استلام USDT (يكتبه المستخدم):</label>
+                <input type="text" id="buyAddress" name="buyAddress">
+
+                <label for="buyNote">ملاحظة (اختياري):</label>
+                <textarea id="buyNote" name="buyNote" rows="3"></textarea>
+
+                <label for="paymentMethodBuy">طريقة الدفع (بالليرة السورية):</label>
+                <select id="paymentMethodBuy" name="paymentMethodBuy">
+                    <option value="">اختر طريقة دفع</option>
+                    <option value="sham_cash">شام كاش</option>
+                    <option value="syriatel_cash">سيريتل كاش</option>
+                    <option value="haram_transfer">حوالة الهرم</option>
+                    <option value="bemo_bank">بنك بيمو</option>
+                </select>
+
+                <div id="buyPaymentDetails" class="section hidden">
+                    <h3>تفاصيل الدفع المطلوبة:</h3>
+                    <p id="buyPaymentInfo"></p>
+                </div>
+            </div>
+
+            <div id="sellSection" class="section hidden">
+                <h2>بيع USDT</h2>
+                <label for="sellAmount">الكمية التي تريد بيعها (USDT):</label>
+                <input type="number" id="sellAmount" name="sellAmount" min="1" step="0.01">
+                <p class="error-message" id="sellAmountError"></p>
+
+                <label for="sellNetwork">اختر الشبكة التي ستبيع منها:</label>
+                <select id="sellNetwork" name="sellNetwork">
+                    <option value="">اختر شبكة</option>
+                    <option value="bep20">BEP20</option>
+                    <option value="trc20">TRC20</option>
+                    <option value="erc20">ERC20</option>
+                    <option value="binance_pay">Binance Pay</option>
+                </select>
+
+                <div id="cryptoAddressSell" class="section hidden">
+                    <h3>عنوان المحفظة المطلوب إرسال USDT إليها:</h3>
+                    <p id="cryptoAddressInfo"></p>
+                </div>
+
+                <label for="paymentMethodSell">طريقة استلام المبلغ (بالليرة السورية):</label>
+                <select id="paymentMethodSell" name="paymentMethodSell">
+                    <option value="">اختر طريقة استلام</option>
+                    <option value="syriatel_cash">سيريتل كاش</option>
+                    <option value="haram_transfer">حوالة الهرم</option>
+                    <option value="bemo_bank">بنك بيمو</option>
+                    <option value="sham_cash">شام كاش</option>
+                </select>
+
+                <div id="sellPaymentDetailsInput" class="hidden">
+                    <label for="bankAccountNum">رقم الحساب البنكي (لبنك بيمو):</label>
+                    <input type="text" id="bankAccountNum" name="bankAccountNum">
+
+                    <label for="shamCashDetails">رقم الحساب أو عنوان الحساب (لشام كاش):</label>
+                    <input type="text" id="shamCashDetails" name="shamCashDetails">
+                </div>
+
+                <label for="sellNote">ملاحظة (اختياري):</label>
+                <textarea id="sellNote" name="sellNote" rows="3"></textarea>
+            </div>
+
+            <button type="submit">إرسال الطلب</button>
+        </form>
+
+        <div id="resultSection" class="result-section">
+            <h2>تم إرسال طلبك بنجاح!</h2>
+            <p><strong>تفاصيل طلبك والعمولات:</strong></p>
+            <div id="orderSummary"></div>
+            <p class="note">ملاحظة: عمولة التسديد على طرق التحويل المختلفة بالليرة السورية تقع على المستخدم كما تحددها هذه الجهات.</p>
+        </div>
     </div>
-
-    <!-- Transaction Type Selection -->
-    <div class="form-section">
-        <h2>نوع العملية</h2>
-        <label for="transactionType">هل تريد البيع أم الشراء؟</label>
-        <select id="transactionType" onchange="toggleTransactionFields()">
-            <option value="">اختر...</option>
-            <option value="buy">شراء USDT</option>
-            <option value="sell">بيع USDT</option>
-        </select>
-    </div>
-
-    <!-- Buy USDT Section -->
-    <div id="buySection" class="form-section hidden">
-        <h2>تفاصيل شراء USDT</h2>
-        <label for="buyAmount">الكمية المطلوبة (USDT):</label>
-        <input type="number" id="buyAmount" min="0" step="0.01" onchange="calculateFees()">
-
-        <label for="buyNetwork">اختر الشبكة:</label>
-        <select id="buyNetwork" onchange="calculateFees()">
-            <option value="">اختر...</option>
-            <option value="bep20">BEP20</option>
-            <option value="trc20">TRC20</option>
-            <option value="erc20">ERC20</option>
-            <option value="binancePay">Binance Pay</option>
-        </select>
-
-        <label for="walletAddress">عنوان المحفظة:</label>
-        <input type="text" id="walletAddress">
-
-        <label for="buyNotes">ملاحظات (اختياري):</label>
-        <textarea id="buyNotes" rows="4"></textarea>
-
-        <label for="paymentMethod">طريقة الدفع:</label>
-        <select id="paymentMethod" onchange="showPaymentDetails()">
-            <option value="">اختر...</option>
-            <option value="shamCash">شام كاش</option>
-            <option value="syriatelCash">سيريتل كاش</option>
-            <option value="haramTransfer">حوالة الهرم</option>
-            <option value="bemoBank">بنك بيمو</option>
-        </select>
-
-        <div id="paymentDetails" class="hidden"></div>
-    </div>
-
-    <!-- Sell USDT Section -->
-    <div id="sellSection" class="form-section hidden">
-        <h2>تفاصيل بيع USDT</h2>
-        <label for="sellAmount">الكمية المراد بيعها (USDT):</label>
-        <input type="number" id="sellAmount" min="0" step="0.01" onchange="calculateFees()">
-
-        <label for="receiveMethod">طريقة الاستلام:</label>
-        <select id="receiveMethod" onchange="showReceiveDetails()">
-            <option value="">اختر...</option>
-            <option value="syriatelCash">سيريتل كاش</option>
-            <option value="haramTransfer">حوالة الهرم</option>
-            <option value="bemoBank">بنك بيمو</option>
-            <option value="shamCash">شام كاش</option>
-        </select>
-
-        <div id="receiveDetails"></div>
-
-        <label for="sellNotes">ملاحظات (اختياري):</label>
-        <textarea id="sellNotes" rows="4"></textarea>
-
-        <label for="sellNetwork">اختر الشبكة:</label>
-        <select id="sellNetwork" onchange="showCryptoAddress()">
-            <option value="">اختر...</option>
-            <option value="bep20">BEP20</option>
-            <option value="trc20">TRC20</option>
-            <option value="erc20">ERC20</option>
-            <option value="binancePay">Binance Pay</option>
-        </select>
-
-        <div id="cryptoAddress" class="hidden"></div>
-    </div>
-
-    <!-- Result Section -->
-    <div id="result"></div>
-
-    <button onclick="submitRequest()">إرسال الطلب</button>
 
     <script>
-        // Toggle visibility of buy/sell sections
-        function toggleTransactionFields() {
-            const transactionType = document.getElementById('transactionType').value;
-            document.getElementById('buySection').classList.add('hidden');
-            document.getElementById('sellSection').classList.add('hidden');
-            document.getElementById('result').style.display = 'none';
+        // افتراضي: سعر USDT مقابل الليرة السورية
+        const USDT_TO_SYP_RATE = 14500; // مثال: 1 USDT = 14500 SYP (يجب تحديث هذا السعر ديناميكيا)
 
-            if (transactionType === 'buy') {
-                document.getElementById('buySection').classList.remove('hidden');
-            } else if (transactionType === 'sell') {
-                document.getElementById('sellSection').classList.remove('hidden');
-            }
-            calculateFees();
-        }
+        // عمولات الشبكات (ثابتة)
+        const NETWORK_FEES = {
+            'trc20': 2,    // دولار
+            'bep20': 0.15, // دولار
+            'erc20': 0.3,  // دولار
+            'binance_pay': 0   // دولار
+        };
 
-        // Show payment details for buying
-        function showPaymentDetails() {
-            const paymentMethod = document.getElementById('paymentMethod').value;
-            const paymentDetails = document.getElementById('paymentDetails');
-            paymentDetails.classList.remove('hidden');
-            let details = '';
+        // عناوين محفظة البائع (للحالة الثانية: بيع USDT)
+        const SELLER_CRYPTO_ADDRESSES = {
+            'bep20': '0x21802218d8d661d66F2C7959347a6382E1cc614F',
+            'trc20': 'TD2LoErPRkVPBxDk72ZErtiyi6agirZQjX',
+            'erc20': '0x21802218d8d661d66F2C7959347a6382E1cc614F',
+            'binance_pay': '969755964'
+        };
 
-            if (paymentMethod === 'shamCash') {
-                details = `
-                    <strong>تفاصيل الدفع (شام كاش):</strong><br>
-                    العنوان: be456e0ea9392db4d68a7093ee317bc8<br>
-                    رقم الحساب: 5991161126028260
-                `;
-            } else if (paymentMethod === 'syriatelCash') {
-                details = `
-                    <strong>تفاصيل الدفع (سيريتل كاش):</strong><br>
-                    العنوان: 0934598967
-                `;
-            } else if (paymentMethod === 'haramTransfer') {
-                details = `
-                    <strong>تفاصيل الدفع (حوالة الهرم):</strong><br>
-                    الاسم: علي ابراهيم محمود<br>
-                    رقم الهاتف: 0934598967<br>
-                    المدينة: اللاذقية
-                `;
-            } else if (paymentMethod === 'bemoBank') {
-                details = `
-                    <strong>تفاصيل الدفع (بنك بيمو):</strong><br>
-                    الاسم: علي ابراهيم محمود<br>
-                    رقم الحساب: 060104947910013000000
-                `;
+        // تفاصيل الدفع للمشتري (للحالة الأولى: شراء USDT)
+        const BUYER_PAYMENT_DETAILS = {
+            'sham_cash': 'عنواني هو: be456e0ea9392db4d68a7093ee317bc8<br>رقم الحساب: 5991161126028260',
+            'syriatel_cash': 'عنواني: 0934598967',
+            'haram_transfer': 'التفاصيل هي:<br>علي ابراهيم محمود<br>0934598967<br>اللاذقية',
+            'bemo_bank': 'التفاصيل هي:<br>علي ابراهيم محمود<br>060104947910013000000'
+        };
+
+        // Elements
+        const transactionTypeRadios = document.querySelectorAll('input[name="transactionType"]');
+        const buySection = document.getElementById('buySection');
+        const sellSection = document.getElementById('sellSection');
+        const buyAmountInput = document.getElementById('buyAmount');
+        const sellAmountInput = document.getElementById('sellAmount');
+        const buyAmountError = document.getElementById('buyAmountError');
+        const sellAmountError = document.getElementById('sellAmountError');
+        const buyNetworkSelect = document.getElementById('buyNetwork');
+        const sellNetworkSelect = document.getElementById('sellNetwork');
+        const cryptoAddressSellDiv = document.getElementById('cryptoAddressSell');
+        const cryptoAddressInfo = document.getElementById('cryptoAddressInfo');
+        const paymentMethodBuySelect = document.getElementById('paymentMethodBuy');
+        const buyPaymentDetailsDiv = document.getElementById('buyPaymentDetails');
+        const buyPaymentInfo = document.getElementById('buyPaymentInfo');
+        const paymentMethodSellSelect = document.getElementById('paymentMethodSell');
+        const sellPaymentDetailsInputDiv = document.getElementById('sellPaymentDetailsInput');
+        const bankAccountNumInput = document.getElementById('bankAccountNum');
+        const shamCashDetailsInput = document.getElementById('shamCashDetails');
+        const resultSection = document.getElementById('resultSection');
+        const orderSummary = document.getElementById('orderSummary');
+        const cryptoForm = document.getElementById('cryptoForm');
+
+        // Event Listeners
+        transactionTypeRadios.forEach(radio => {
+            radio.addEventListener('change', function() {
+                if (this.value === 'buy') {
+                    buySection.classList.remove('hidden');
+                    sellSection.classList.add('hidden');
+                    buyAmountInput.setAttribute('required', 'true');
+                    sellAmountInput.removeAttribute('required');
+                } else {
+                    sellSection.classList.remove('hidden');
+                    buySection.classList.add('hidden');
+                    sellAmountInput.setAttribute('required', 'true');
+                    buyAmountInput.removeAttribute('required');
+                }
+                // Reset any previous selections/displays
+                buyPaymentDetailsDiv.classList.add('hidden');
+                cryptoAddressSellDiv.classList.add('hidden');
+                sellPaymentDetailsInputDiv.classList.add('hidden');
+                buyAmountError.textContent = '';
+                sellAmountError.textContent = '';
+            });
+        });
+
+        buyAmountInput.addEventListener('input', validateBuyAmount);
+        sellAmountInput.addEventListener('input', validateSellAmount);
+
+        buyNetworkSelect.addEventListener('change', function() {
+            // No dynamic update for buy network, just selected
+        });
+
+        sellNetworkSelect.addEventListener('change', function() {
+            const selectedNetwork = this.value;
+            if (selectedNetwork && SELLER_CRYPTO_ADDRESSES[selectedNetwork]) {
+                cryptoAddressInfo.innerHTML = `<strong>${selectedNetwork.toUpperCase()}:</strong> ${SELLER_CRYPTO_ADDRESSES[selectedNetwork]}`;
+                cryptoAddressSellDiv.classList.remove('hidden');
             } else {
-                paymentDetails.classList.add('hidden');
+                cryptoAddressSellDiv.classList.add('hidden');
             }
+        });
 
-            paymentDetails.innerHTML = details;
-        }
-
-        // Show receive details for selling
-        function showReceiveDetails() {
-            const receiveMethod = document.getElementById('receiveMethod').value;
-            const receiveDetails = document.getElementById('receiveDetails');
-            let details = '';
-
-            if (receiveMethod === 'syriatelCash') {
-                details = `
-                    <label>رقم الحساب (سيريتل كاش):</label>
-                    <input type="text" id="receiveAccount" required>
-                `;
-            } else if (receiveMethod === 'haramTransfer') {
-                details = `
-                    <label>تفاصيل الحوالة (حوالة الهرم):</label>
-                    <input type="text" id="receiveAccount" placeholder="الاسم، رقم الهاتف، المدينة" required>
-                `;
-            } else if (receiveMethod === 'bemoBank') {
-                details = `
-                    <label>رقم الحساب البنكي (بنك بيمو):</label>
-                    <input type="text" id="receiveAccount" required>
-                `;
-            } else if (receiveMethod === 'shamCash') {
-                details = `
-                    <label>رقم الحساب أو عنوان الحساب (شام كاش):</label>
-                    <input type="text" id="receiveAccount" required>
-                `;
+        paymentMethodBuySelect.addEventListener('change', function() {
+            const selectedMethod = this.value;
+            if (selectedMethod && BUYER_PAYMENT_DETAILS[selectedMethod]) {
+                buyPaymentInfo.innerHTML = BUYER_PAYMENT_DETAILS[selectedMethod];
+                buyPaymentDetailsDiv.classList.remove('hidden');
             } else {
-                details = '';
+                buyPaymentDetailsDiv.classList.add('hidden');
             }
+        });
 
-            receiveDetails.innerHTML = details;
-        }
+        paymentMethodSellSelect.addEventListener('change', function() {
+            const selectedMethod = this.value;
+            bankAccountNumInput.removeAttribute('required');
+            shamCashDetailsInput.removeAttribute('required');
+            bankAccountNumInput.value = '';
+            shamCashDetailsInput.value = '';
 
-        // Show crypto address for selling
-        function showCryptoAddress() {
-            const sellNetwork = document.getElementById('sellNetwork').value;
-            const cryptoAddress = document.getElementById('cryptoAddress');
-            cryptoAddress.classList.remove('hidden');
-            let address = '';
-
-            if (sellNetwork === 'bep20') {
-                address = 'BEP20: 0x21802218d8d661d66F2C7959347a6382E1cc614F';
-            } else if (sellNetwork === 'trc20') {
-                address = 'TRC20: TD2LoErPRkVPBxDk72ZErtiyi6agirZQjX';
-            } else if (sellNetwork === 'erc20') {
-                address = 'ERC20: 0x21802218d8d661d66F2C7959347a6382E1cc614F';
-            } else if (sellNetwork === 'binancePay') {
-                address = 'Binance Pay: 969755964';
+            if (selectedMethod === 'bemo_bank') {
+                sellPaymentDetailsInputDiv.classList.remove('hidden');
+                bankAccountNumInput.style.display = 'block';
+                shamCashDetailsInput.style.display = 'none';
+                bankAccountNumInput.setAttribute('required', 'true');
+            } else if (selectedMethod === 'sham_cash') {
+                sellPaymentDetailsInputDiv.classList.remove('hidden');
+                shamCashDetailsInput.style.display = 'block';
+                bankAccountNumInput.style.display = 'none';
+                shamCashDetailsInput.setAttribute('required', 'true');
             } else {
-                cryptoAddress.classList.add('hidden');
+                sellPaymentDetailsInputDiv.classList.add('hidden');
             }
+        });
 
-            cryptoAddress.innerHTML = `<strong>عنوان الإرسال:</strong><br>${address}`;
-        }
+        function calculateCommission(amount, transactionType, network) {
+            let commissionPercentage = 0;
+            let fixedCommissionUSD = 0;
+            let networkFee = NETWORK_FEES[network] || 0;
 
-        // Calculate fees
-        function calculateFees() {
-            const transactionType = document.getElementById('transactionType').value;
-            let amount = 0;
-            let network = '';
-            let commission = 0;
-            let networkFee = 0;
-
-            if (transactionType === 'buy') {
-                amount = parseFloat(document.getElementById('buyAmount').value) || 0;
-                network = document.getElementById('buyNetwork').value;
-            } else if (transactionType === 'sell') {
-                amount = parseFloat(document.getElementById('sellAmount').value) || 0;
-                network = document.getElementById('sellNetwork').value;
-            }
-
-            // Calculate commission
             if (amount < 100) {
-                commission = 1.65;
-            } else if (amount <= 5000) {
-                commission = amount * 0.0165;
-            } else {
-                commission = amount * 0.005;
+                fixedCommissionUSD = 1.65;
+            } else if (amount >= 100 && amount <= 5000) {
+                commissionPercentage = 0.0165; // 1.65%
+            } else { // amount > 5000
+                commissionPercentage = 0.0005; // 0.05%
             }
 
-            // Network fees
-            if (network === 'trc20') {
-                networkFee = 0.3;
-            } else if (network === 'bep20') {
-                networkFee = 0.15;
-            } else if (network === 'erc20') {
-                networkFee = 2;
-            } else if (network === 'binancePay') {
-                networkFee = 0;
+            let commissionAmount = amount * commissionPercentage;
+            if (fixedCommissionUSD > 0) {
+                commissionAmount = fixedCommissionUSD;
             }
+            
+            // For selling, network fee is deducted from the USDT received.
+            // For buying, network fee is added to the total cost.
+            let totalCommission = commissionAmount + networkFee;
 
-            const totalFees = commission + networkFee;
-            const netAmount = amount - totalFees;
-
-            document.getElementById('result').style.display = 'block';
-            document.getElementById('result').innerHTML = `
-                <strong>تفاصيل العمولة:</strong><br>
-                المبلغ: ${amount.toFixed(2)} USDT<br>
-                عمولة التحويل: ${commission.toFixed(2)} USDT<br>
-                رسوم الشبكة (${network || 'غير محدد'}): ${networkFee.toFixed(2)} USDT<br>
-                الإجمالي (المبلغ بعد الرسوم): ${netAmount.toFixed(2)} USDT
-            `;
+            return {
+                baseCommissionUSD: commissionAmount,
+                networkFeeUSD: networkFee,
+                totalUSDCommission: totalCommission
+            };
         }
 
-        // Submit request
-        function submitRequest() {
-            const fullName = document.getElementById('fullName').value;
-            const phoneNumber = document.getElementById('phoneNumber').value;
-            const city = document.getElementById('city').value;
-            const transactionType = document.getElementById('transactionType').value;
+        function validateBuyAmount() {
+            const amount = parseFloat(buyAmountInput.value);
+            if (isNaN(amount) || amount <= 0) {
+                buyAmountError.textContent = 'الرجاء إدخال كمية صحيحة (أكبر من 0).';
+                return false;
+            } else {
+                buyAmountError.textContent = '';
+                return true;
+            }
+        }
 
-            if (!fullName || !phoneNumber || !city || !transactionType) {
-                alert('يرجى ملء جميع الحقول المطلوبة في معلومات المستخدم ونوع العملية.');
+        function validateSellAmount() {
+            const amount = parseFloat(sellAmountInput.value);
+            if (isNaN(amount) || amount <= 0) {
+                sellAmountError.textContent = 'الرجاء إدخال كمية صحيحة (أكبر من 0).';
+                return false;
+            } else {
+                sellAmountError.textContent = '';
+                return true;
+            }
+        }
+
+        cryptoForm.addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent default form submission
+
+            if (!cryptoForm.checkValidity()) {
+                alert('الرجاء تعبئة جميع الحقول المطلوبة بشكل صحيح.');
                 return;
             }
 
-            let emailBody = `طلب تحويل USDT\n\n`;
-            emailBody += `معلومات المستخدم:\n`;
-            emailBody += `الاسم الثلاثي: ${fullName}\n`;
-            emailBody += `رقم الهاتف: ${phoneNumber}\n`;
-            emailBody += `المدينة: ${city}\n\n`;
+            const fullName = document.getElementById('fullName').value;
+            const phone = document.getElementById('phone').value;
+            const city = document.getElementById('city').value;
+            const transactionType = document.querySelector('input[name="transactionType"]:checked').value;
 
-            let amount, network, commission, networkFee, netAmount;
+            let orderDetails = {
+                fullName,
+                phone,
+                city,
+                transactionType
+            };
+
+            let totalUSDT = 0;
+            let totalSYP = 0;
+            let feesInfo = {};
+            let paymentDetailsGiven = '';
 
             if (transactionType === 'buy') {
-                amount = parseFloat(document.getElementById('buyAmount').value) || 0;
-                network = document.getElementById('buyNetwork').value;
-                const walletAddress = document.getElementById('walletAddress').value;
-                const notes = record.getElementById('buyNotes').value;
-                const paymentMethod = document.getElementById('paymentMethod').value;
+                totalUSDT = parseFloat(buyAmountInput.value);
+                const buyNetwork = buyNetworkSelect.value;
+                const buyAddress = document.getElementById('buyAddress').value;
+                const buyNote = document.getElementById('buyNote').value;
+                const paymentMethodBuy = paymentMethodBuySelect.value;
 
-                if (!amount || !network || !walletAddress || !paymentMethod) {
-                    alert('يرجى ملء جميع الحقول المطلوبة في قسم الشراء.');
+                if (!validateBuyAmount() || !buyNetwork || !buyAddress || !paymentMethodBuy) {
+                    alert('الرجاء التأكد من تعبئة جميع حقول الشراء المطلوبة.');
                     return;
                 }
 
-                // Calculate fees
-                if (amount < 100) {
-                    commission = 1.65;
-                } else if (amount <= 5000) {
-                    commission = amount * 0.0165;
-                } else {
-                    commission = amount * 0.005;
-                }
+                feesInfo = calculateCommission(totalUSDT, 'buy', buyNetwork);
+                let totalUSDTWithFees = totalUSDT + feesInfo.totalUSDCommission; // Customer pays fees
+                totalSYP = totalUSDTWithFees * USDT_TO_SYP_RATE;
 
-                if (network === 'trc20') {
-                    networkFee = 0.3;
-                } else if (network === 'bep20') {
-                    networkFee = 0.15;
-                } else if (network === 'erc20') {
-                    networkFee = 2;
-                } else if (network === 'binancePay') {
-                    networkFee = 0;
-                }
+                orderDetails = {
+                    ...orderDetails,
+                    buyAmount: totalUSDT,
+                    buyNetwork,
+                    buyAddress,
+                    buyNote,
+                    paymentMethodBuy,
+                    totalUSDTToPay: totalUSDTWithFees.toFixed(2),
+                    totalSYPToPay: totalSYP.toFixed(2),
+                    commissionDetails: feesInfo
+                };
+                paymentDetailsGiven = BUYER_PAYMENT_DETAILS[paymentMethodBuy];
 
-                netAmount = amount - (commission + networkFee);
+            } else { // sell
+                totalUSDT = parseFloat(sellAmountInput.value);
+                const sellNetwork = sellNetworkSelect.value;
+                const sellNote = document.getElementById('sellNote').value;
+                const paymentMethodSell = paymentMethodSellSelect.value;
+                const bankAccountNum = document.getElementById('bankAccountNum').value;
+                const shamCashDetails = document.getElementById('shamCashDetails').value;
 
-                emailBody += `تفاصيل الشراء:\n`;
-                emailBody += `الكمية: ${amount.toFixed(2)} USDT\n`;
-                emailBody += `الشبكة: ${network}\n`;
-                emailBody += `عنوان المحفظة: ${walletAddress}\n`;
-                emailBody += `طريقة الدفع: ${paymentMethod}\n`;
-                emailBody += `ملاحظات: ${notes || 'لا توجد'}\n`;
-                emailBody += `تفاصيل الدفع:\n${document.getElementById('paymentDetails').innerText}\n`;
-                emailBody += `عمولة التحويل: ${commission.toFixed(2)} USDT\n`;
-                emailBody += `رسوم الشبكة: ${networkFee.toFixed(2)} USDT\n`;
-                emailBody += `الصافي: ${netAmount.toFixed(2)} USDT\n`;
-            } else if (transactionType === 'sell') {
-                amount = parseFloat(document.getElementById('sellAmount').value) || 0;
-                network = document.getElementById('sellNetwork').value;
-                const receiveMethod = document.getElementById('receiveMethod').value;
-                const receiveAccount = document.getElementById('receiveAccount')?.value;
-                const notes = document.getElementById('sellNotes').value;
-
-                if (!amount || !network || !receiveMethod || !receiveAccount) {
-                    alert('يرجى ملء جميع الحقول المطلوبة في قسم البيع.');
+                if (!validateSellAmount() || !sellNetwork || !paymentMethodSell ||
+                    (paymentMethodSell === 'bemo_bank' && !bankAccountNum) ||
+                    (paymentMethodSell === 'sham_cash' && !shamCashDetails)) {
+                    alert('الرجاء التأكد من تعبئة جميع حقول البيع المطلوبة.');
                     return;
                 }
 
-                // Calculate fees
-                if (amount < 100) {
-                    commission = 1.65;
-                } else if (amount <= 5000) {
-                    commission = amount * 0.0165;
-                } else {
-                    commission = amount * 0.005;
+                feesInfo = calculateCommission(totalUSDT, 'sell', sellNetwork);
+                let receivedUSDTAfterFees = totalUSDT - feesInfo.totalUSDCommission; // Fees deducted from user
+                totalSYP = receivedUSDTAfterFees * USDT_TO_SYP_RATE;
+
+                orderDetails = {
+                    ...orderDetails,
+                    sellAmount: totalUSDT,
+                    sellNetwork,
+                    sellNote,
+                    paymentMethodSell,
+                    receivedUSDTAfterFees: receivedUSDTAfterFees.toFixed(2),
+                    receivedSYP: totalSYP.toFixed(2),
+                    commissionDetails: feesInfo
+                };
+                orderDetails.sellerCryptoAddress = SELLER_CRYPTO_ADDRESSES[sellNetwork];
+                if (paymentMethodSell === 'bemo_bank') {
+                    orderDetails.bankAccountNum = bankAccountNum;
+                } else if (paymentMethodSell === 'sham_cash') {
+                    orderDetails.shamCashDetails = shamCashDetails;
                 }
-
-                if (network === 'trc20') {
-                    networkFee = 0.3;
-                } else if (network === 'bep20') {
-                    networkFee = 0.15;
-                } else if (network === 'erc20') {
-                    networkFee = 2;
-                } else if (network === 'binancePay') {
-                    networkFee = 0;
-                }
-
-                netAmount = amount - (commission + networkFee);
-
-                emailBody += `تفاصيل البيع:\n`;
-                emailBody += `الكمية: ${amount.toFixed(2)} USDT\n`;
-                emailBody += `الشبكة: ${network}\n`;
-                emailBody += `طريقة الاستلام: ${receiveMethod}\n`;
-                emailBody += `تفاصيل الحساب: ${receiveAccount}\n`;
-                emailBody += `ملاحظات: ${notes || 'لا توجد'}\n`;
-                emailBody += `عنوان الإرسال:\n${document.getElementById('cryptoAddress').innerText}\n`;
-                emailBody += `عمولة التحويل: ${commission.toFixed(2)} USDT\n`;
-                emailBody += `رسوم الشبكة: ${networkFee.toFixed(2)} USDT\n`;
-                emailBody += `الصافي: ${netAmount.toFixed(2)} USDT\n`;
             }
 
-            emailBody += `\nملاحظة: عمولة التسديد على طرق التحويل المختلفة بالليرة السورية تقع على المستخدم كما تحددها هذه الجهات.`;
+            // Display results to user
+            let summaryHTML = `<p><strong>الاسم:</strong> ${fullName}</p>`;
+            summaryHTML += `<p><strong>الهاتف:</strong> ${phone}</p>`;
+            summaryHTML += `<p><strong>المدينة:</strong> ${city}</p>`;
+            summaryHTML += `<p><strong>نوع العملية:</strong> ${transactionType === 'buy' ? 'شراء USDT' : 'بيع USDT'}</p>`;
 
-            // Simulate sending email (replace with actual email API if available)
-            console.log('Sending email to alimahmoud001a@gmail.com with body:\n', emailBody);
-            alert('تم إرسال الطلب بنجاح!\n' + emailBody);
+            if (transactionType === 'buy') {
+                summaryHTML += `<p><strong>الكمية المطلوبة (USDT):</strong> ${orderDetails.buyAmount} USDT</p>`;
+                summaryHTML += `<p><strong>الشبكة:</strong> ${orderDetails.buyNetwork.toUpperCase()}</p>`;
+                summaryHTML += `<p><strong>عنوان استلام USDT:</strong> ${orderDetails.buyAddress}</p>`;
+                summaryHTML += `<p><strong>طريقة الدفع (ليرة سورية):</strong> ${orderDetails.paymentMethodBuy === 'sham_cash' ? 'شام كاش' : orderDetails.paymentMethodBuy === 'syriatel_cash' ? 'سيريتل كاش' : orderDetails.paymentMethodBuy === 'haram_transfer' ? 'حوالة الهرم' : 'بنك بيمو'}</p>`;
+                summaryHTML += `<p><strong>العمولة الأساسية (دولار):</strong> ${feesInfo.baseCommissionUSD.toFixed(2)} $</p>`;
+                summaryHTML += `<p><strong>عمولة الشبكة (دولار):</strong> ${feesInfo.networkFeeUSD.toFixed(2)} $</p>`;
+                summaryHTML += `<p><strong>إجمالي العمولة بالدولار:</strong> ${feesInfo.totalUSDCommission.toFixed(2)} $</p>`;
+                summaryHTML += `<p><strong>إجمالي ما ستدفعه (USDT):</strong> ${orderDetails.totalUSDTToPay} USDT</p>`;
+                summaryHTML += `<p><strong>المبلغ المطلوب دفعه بالليرة السورية:</strong> ${orderDetails.totalSYPToPay} ل.س</p>`;
+                if (paymentDetailsGiven) {
+                    summaryHTML += `<div style="border-top: 1px dashed #ccc; padding-top: 10px; margin-top: 15px;">`;
+                    summaryHTML += `<h4>تفاصيل الدفع لإتمام عملية الشراء:</h4>`;
+                    summaryHTML += `<p>${paymentDetailsGiven}</p></div>`;
+                }
+            } else { // sell
+                summaryHTML += `<p><strong>الكمية التي تبيعها (USDT):</strong> ${orderDetails.sellAmount} USDT</p>`;
+                summaryHTML += `<p><strong>الشبكة التي تبيع منها:</strong> ${orderDetails.sellNetwork.toUpperCase()}</p>`;
+                summaryHTML += `<p><strong>عنوان محفظتنا لاستلام USDT:</strong> ${orderDetails.sellerCryptoAddress}</p>`;
+                summaryHTML += `<p><strong>طريقة استلام المبلغ (ليرة سورية):</strong> ${orderDetails.paymentMethodSell === 'syriatel_cash' ? 'سيريتل كاش' : orderDetails.paymentMethodSell === 'haram_transfer' ? 'حوالة الهرم' : orderDetails.paymentMethodSell === 'bemo_bank' ? 'بنك بيمو' : 'شام كاش'}</p>`;
+                if (orderDetails.bankAccountNum) {
+                    summaryHTML += `<p><strong>رقم الحساب البنكي:</strong> ${orderDetails.bankAccountNum}</p>`;
+                }
+                if (orderDetails.shamCashDetails) {
+                    summaryHTML += `<p><strong>رقم/عنوان حساب شام كاش:</strong> ${orderDetails.shamCashDetails}</p>`;
+                }
+                summaryHTML += `<p><strong>العمولة الأساسية (دولار):</strong> ${feesInfo.baseCommissionUSD.toFixed(2)} $</p>`;
+                summaryHTML += `<p><strong>عمولة الشبكة (دولار):</strong> ${feesInfo.networkFeeUSD.toFixed(2)} $</p>`;
+                summaryHTML += `<p><strong>إجمالي العمولة بالدولار:</strong> ${feesInfo.totalUSDCommission.toFixed(2)} $</p>`;
+                summaryHTML += `<p><strong>صافي USDT التي ستستلمها بعد العمولات:</strong> ${orderDetails.receivedUSDTAfterFees} USDT</p>`;
+                summaryHTML += `<p><strong>المبلغ الذي ستستلمه بالليرة السورية:</strong> ${orderDetails.receivedSYP} ل.س</p>`;
+            }
 
-            // Display result to user
-            document.getElementById('result').style.display = 'block';
-            document.getElementById('result').innerHTML += `<br><strong>تم إرسال الطلب بنجاح!</strong><br>ملاحظة: عمولة التسديد على طرق التحويل المختلفة بالليرة السورية تقع على المستخدم كما تحددها هذه الجهات.`;
-        }
+            orderSummary.innerHTML = summaryHTML;
+            resultSection.style.display = 'block';
+
+            // Scroll to the result section
+            resultSection.scrollIntoView({ behavior: 'smooth' });
+
+
+            // --- Backend Integration Placeholder ---
+            // This is where you would send the 'orderDetails' object to your server-side script
+            // (e.g., PHP, Node.js) to send the email.
+            // Example using fetch API (requires a server-side endpoint):
+            /*
+            fetch('your_server_endpoint_to_send_email.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(orderDetails),
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Success:', data);
+                // Optionally show a success message or redirect
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                // Handle error (e.g., show error message to user)
+            });
+            */
+            // For demonstration, we'll just log it to console.
+            console.log("Order Details to be sent:", orderDetails);
+        });
+
     </script>
 </body>
 </html>
