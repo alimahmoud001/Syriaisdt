@@ -13,6 +13,7 @@
             --light: #f7fafc;
             --dark: #1a202c;
             --danger: #e53e3e;
+            --warning: #dd6b20;
         }
         
         * {
@@ -210,7 +211,6 @@
             display: block;
             width: 100%;
             padding: 16px;
-            background: linear-gradient(to right, var(--primary), var(--secondary));
             color: white;
             border: none;
             border-radius: 8px;
@@ -219,6 +219,15 @@
             cursor: pointer;
             transition: all 0.3s;
             margin-top: 20px;
+        }
+        
+        .review-btn {
+            background: linear-gradient(to right, var(--warning), #e67e22);
+        }
+        
+        .submit-btn {
+            background: linear-gradient(to right, var(--accent), #2ecc71);
+            display: none;
         }
         
         .btn:hover {
@@ -266,6 +275,19 @@
         .success-message h2 {
             color: var(--accent);
             margin-bottom: 20px;
+        }
+        
+        .fee-info {
+            background: #fff8e1;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border-left: 4px solid var(--warning);
+        }
+        
+        .fee-info i {
+            color: var(--warning);
+            margin-left: 5px;
         }
         
         @media (max-width: 768px) {
@@ -320,6 +342,11 @@
                     <label for="city">المدينة</label>
                     <input type="text" id="city" placeholder="المدينة">
                 </div>
+            </div>
+            
+            <div class="fee-info">
+                <i class="fas fa-info-circle"></i>
+                <strong>نظام العمولة :</strong> 1 دولار ثابت + 0.5% من المبلغ الكامل
             </div>
             
             <div class="section">
@@ -493,6 +520,8 @@
                 </div>
             </div>
             
+            <button id="reviewBtn" class="btn review-btn">مراجعة الطلب</button>
+            
             <div class="summary" id="summarySection">
                 <h2 class="section-title"><i class="fas fa-file-invoice"></i> ملخص الطلب</h2>
                 <div class="summary-item">
@@ -512,7 +541,7 @@
                     <span id="summaryAmount"></span>
                 </div>
                 <div class="summary-item">
-                    <span>عمولة التحويل:</span>
+                    <span>عمولة التحويل (1 دولار + 0.5%):</span>
                     <span id="summaryFee"></span>
                 </div>
                 <div class="summary-item">
@@ -532,7 +561,7 @@
                 </p>
             </div>
             
-            <button id="submitBtn" class="btn">إرسال الطلب</button>
+            <button id="submitBtn" class="btn submit-btn">إرسال الطلب</button>
             
             <div class="success-message" id="successMessage">
                 <i class="fas fa-check-circle"></i>
@@ -560,6 +589,7 @@
         const transactionTypeRadios = document.querySelectorAll('input[name="transactionType"]');
         const paymentMethod = document.getElementById('paymentMethod');
         const receiveMethod = document.getElementById('receiveMethod');
+        const reviewBtn = document.getElementById('reviewBtn');
         const submitBtn = document.getElementById('submitBtn');
         const summarySection = document.getElementById('summarySection');
         const successMessage = document.getElementById('successMessage');
@@ -641,17 +671,10 @@
             });
         });
         
-        // Calculate fees
+        // Calculate fees with new structure: $1 + 0.5% of total amount
         function calculateFees(amount, network) {
-            let transactionFee;
-            
-            if (amount < 100) {
-                transactionFee = 1.65;
-            } else if (amount <= 5000) {
-                transactionFee = amount * 0.01;
-            } else {
-                transactionFee = amount * 0.0005;
-            }
+            // العمولة الجديدة: 1 دولار ثابت + 0.5% من المبلغ
+            const transactionFee = 1 + (amount * 0.005);
             
             const networkFee = NETWORK_FEES[network] || 0;
             const totalFeeUSD = transactionFee + networkFee;
@@ -665,8 +688,8 @@
             };
         }
         
-        // Form submission
-        submitBtn.addEventListener('click', function(e) {
+        // Review button handler
+        reviewBtn.addEventListener('click', function(e) {
             e.preventDefault();
             
             // Get basic user info
@@ -758,46 +781,70 @@
             document.getElementById('summaryPhone').textContent = phone;
             document.getElementById('summaryType').textContent = transactionType === 'buy' ? 'شراء' : 'بيع';
             document.getElementById('summaryAmount').textContent = amount + ' USDT';
-            document.getElementById('summaryFee').textContent = fees.transactionFee.toFixed(2) + ' USD';
-            document.getElementById('summaryNetworkFee').textContent = fees.networkFee.toFixed(2) + ' USD';
+            document.getElementById('summaryFee').textContent = fees.transactionFee.toFixed(2) + ' USD (' + (fees.transactionFee * EXCHANGE_RATE).toLocaleString() + ' SYP)';
+            document.getElementById('summaryNetworkFee').textContent = fees.networkFee.toFixed(2) + ' USD (' + (fees.networkFee * EXCHANGE_RATE).toLocaleString() + ' SYP)';
             document.getElementById('summaryTotal').textContent = totalAmountSYP.toLocaleString() + ' SYP';
             document.getElementById('summaryNotes').textContent = notes || 'لا يوجد';
             
-            // Show summary
+            // Store data for submission
+            window.transactionData = {
+                fullName,
+                phone,
+                city,
+                transactionType,
+                amount,
+                network,
+                notes,
+                methodDetails,
+                fees,
+                totalAmountSYP
+            };
+            
+            // Show summary and submit button
             summarySection.style.display = 'block';
+            submitBtn.style.display = 'block';
+            reviewBtn.style.display = 'none';
+            
+            // Scroll to summary
+            summarySection.scrollIntoView({ behavior: 'smooth' });
+        });
+        
+        // Submit button handler
+        submitBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            const data = window.transactionData;
             
             // Prepare final summary for email
             const finalSummary = `
-                <p><strong>الاسم:</strong> ${fullName}</p>
-                <p><strong>رقم الهاتف:</strong> ${phone}</p>
-                <p><strong>المدينة:</strong> ${city}</p>
-                <p><strong>نوع العملية:</strong> ${transactionType === 'buy' ? 'شراء' : 'بيع'}</p>
-                <p><strong>الكمية:</strong> ${amount} USDT</p>
-                <p><strong>عمولة التحويل:</strong> ${fees.transactionFee.toFixed(2)} USD</p>
-                <p><strong>عمولة الشبكة:</strong> ${fees.networkFee.toFixed(2)} USD</p>
-                <p><strong>المبلغ الإجمالي:</strong> ${totalAmountSYP.toLocaleString()} SYP</p>
-                <p><strong>تفاصيل الدفع/الاستلام:</strong> ${methodDetails}</p>
-                <p><strong>ملاحظات:</strong> ${notes || 'لا يوجد'}</p>
+                <p><strong>الاسم:</strong> ${data.fullName}</p>
+                <p><strong>رقم الهاتف:</strong> ${data.phone}</p>
+                <p><strong>المدينة:</strong> ${data.city}</p>
+                <p><strong>نوع العملية:</strong> ${data.transactionType === 'buy' ? 'شراء' : 'بيع'}</p>
+                <p><strong>الكمية:</strong> ${data.amount} USDT</p>
+                <p><strong>عمولة التحويل:</strong> ${data.fees.transactionFee.toFixed(2)} USD</p>
+                <p><strong>عمولة الشبكة:</strong> ${data.fees.networkFee.toFixed(2)} USD</p>
+                <p><strong>المبلغ الإجمالي:</strong> ${data.totalAmountSYP.toLocaleString()} SYP</p>
+                <p><strong>تفاصيل الدفع/الاستلام:</strong> ${data.methodDetails}</p>
+                <p><strong>ملاحظات:</strong> ${data.notes || 'لا يوجد'}</p>
             `;
             
             document.getElementById('finalSummary').innerHTML = finalSummary;
             
             // Prepare email content
-            const subject = `طلب جديد: ${transactionType === 'buy' ? 'شراء' : 'بيع'} USDT`;
+            const subject = `طلب جديد: ${data.transactionType === 'buy' ? 'شراء' : 'بيع'} USDT`;
             const body = `تفاصيل الطلب الجديد:%0D%0A%0D%0A${finalSummary.replace(/<[^>]*>/g, '')}`;
             
             // Show success message
-            setTimeout(() => {
-                document.querySelector('.form-container').scrollTop = 0;
-                summarySection.style.display = 'none';
-                successMessage.style.display = 'block';
-                
-                // Create mailto link
-                const mailtoLink = `mailto:alimahmoud001a@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-                
-                // Open email client
-                window.location.href = mailtoLink;
-            }, 2000);
+            summarySection.style.display = 'none';
+            submitBtn.style.display = 'none';
+            successMessage.style.display = 'block';
+            
+            // Create mailto link
+            const mailtoLink = `mailto:alimahmoud001a@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+            
+            // Open email client
+            window.location.href = mailtoLink;
         });
     </script>
 </body>
