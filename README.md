@@ -396,7 +396,7 @@
             to { opacity: 1; transform: translateY(0); }
         }
         
-        @media (max-width: 400px) {
+        @media (max-width: 768px) {
             .radio-group {
                 flex-direction: column;
             }
@@ -432,7 +432,7 @@
         }
     
         
-        @media (max-width: 480px) {
+        @media (max-width: 380px) {
             body {
                 padding: 10px;
             }
