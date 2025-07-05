@@ -1,0 +1,1026 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>منصة تحويل العملات الرقمية - USDT</title>
+    <!-- EmailJS Library -->
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            direction: rtl;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .step {
+            display: none;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        .step.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+            font-size: 1.1rem;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #4facfe;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.1);
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 10px 5px;
+            min-width: 120px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(79, 172, 254, 0.3);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .btn-back {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            color: #333;
+        }
+
+        .option-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .option-btn {
+            background: white;
+            border: 2px solid #e1e5e9;
+            padding: 20px;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .option-btn:hover {
+            border-color: #4facfe;
+            background: #f8f9ff;
+            transform: translateY(-2px);
+        }
+
+        .option-btn.selected {
+            border-color: #4facfe;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+        }
+
+        .network-info {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 10px 0;
+            border-left: 4px solid #4facfe;
+        }
+
+        .fee-info {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .fee-info h3 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .summary {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 15px;
+            margin: 20px 0;
+            border: 2px solid #e1e5e9;
+        }
+
+        .summary h3 {
+            color: #333;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            margin: 10px 0;
+            padding: 10px 0;
+            border-bottom: 1px solid #e1e5e9;
+        }
+
+        .summary-item:last-child {
+            border-bottom: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: #4facfe;
+        }
+
+        .progress-bar {
+            background: #e1e5e9;
+            height: 6px;
+            border-radius: 3px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            height: 100%;
+            transition: width 0.5s ease;
+        }
+
+        .step-indicator {
+            text-align: center;
+            margin: 20px 0;
+            color: #666;
+            font-weight: 600;
+        }
+
+        .crypto-address {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            font-family: monospace;
+            font-size: 0.9rem;
+            word-break: break-all;
+            border: 2px solid #e1e5e9;
+            margin: 10px 0;
+        }
+
+        .notice {
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+            text-align: center;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .success-message {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .success-message h2 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                border-radius: 15px;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .option-buttons {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🪙 منصة تحويل العملات الرقمية</h1>
+            <p>تحويل آمن وسريع لعملة USDT مع وسائل الدفع السورية</p>
+        </div>
+
+        <div class="content">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill" style="width: 20%"></div>
+            </div>
+            <div class="step-indicator" id="stepIndicator">الخطوة 1 من 5</div>
+
+            <!-- الخطوة الأولى: البيانات الشخصية -->
+            <div class="step active" id="step1">
+                <h2 style="text-align: center; margin-bottom: 30px; color: #333;">📝 البيانات الشخصية</h2>
+                
+                <div class="form-group">
+                    <label for="fullName">الاسم الثلاثي *</label>
+                    <input type="text" id="fullName" placeholder="أدخل اسمك الثلاثي" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="phoneNumber">رقم الهاتف *</label>
+                    <input type="tel" id="phoneNumber" placeholder="أدخل رقم هاتفك" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="city">المدينة *</label>
+                    <select id="city" required>
+                        <option value="">اختر المدينة</option>
+                        <option value="دمشق">دمشق</option>
+                        <option value="حلب">حلب</option>
+                        <option value="حمص">حمص</option>
+                        <option value="حماة">حماة</option>
+                        <option value="اللاذقية">اللاذقية</option>
+                        <option value="طرطوس">طرطوس</option>
+                        <option value="درعا">درعا</option>
+                        <option value="السويداء">السويداء</option>
+                        <option value="القنيطرة">القنيطرة</option>
+                        <option value="الرقة">الرقة</option>
+                        <option value="دير الزور">دير الزور</option>
+                        <option value="الحسكة">الحسكة</option>
+                        <option value="إدلب">إدلب</option>
+                        <option value="أخرى">أخرى</option>
+                    </select>
+                </div>
+
+                <div style="text-align: center; margin-top: 30px;">
+                    <button class="btn" onclick="nextStep(1)">التالي ⬅️</button>
+                </div>
+            </div>
+
+            <!-- الخطوة الثانية: نوع العملية -->
+            <div class="step" id="step2">
+                <h2 style="text-align: center; margin-bottom: 30px; color: #333;">🔄 نوع العملية</h2>
+                
+                <div class="option-buttons">
+                    <div class="option-btn" onclick="selectOperation('buy')">
+                        <h3>💰 شراء USDT</h3>
+                        <p>شراء عملة USDT بالليرة السورية</p>
+                    </div>
+                    <div class="option-btn" onclick="selectOperation('sell')">
+                        <h3>💸 بيع USDT</h3>
+                        <p>بيع عملة USDT مقابل الليرة السورية</p>
+                    </div>
+                </div>
+
+                <div style="text-align: center; margin-top: 30px;">
+                    <button class="btn-back btn" onclick="prevStep(2)">⬅️ السابق</button>
+                    <button class="btn" id="operationNextBtn" onclick="nextStep(2)" disabled>التالي ⬅️</button>
+                </div>
+            </div>
+
+            <!-- الخطوة الثالثة أ: تفاصيل الشراء -->
+            <div class="step" id="step3buy">
+                <h2 style="text-align: center; margin-bottom: 30px; color: #333;">💰 تفاصيل الشراء</h2>
+                
+                <div class="form-group">
+                    <label for="usdtAmount">كمية USDT المطلوبة *</label>
+                    <input type="number" id="usdtAmount" placeholder="أدخل الكمية" min="1" step="0.01" oninput="calculateFees()">
+                </div>
+
+                <div class="form-group">
+                    <label>اختر الشبكة *</label>
+                    <div class="option-buttons">
+                        <div class="option-btn" onclick="selectNetwork('bep20')">
+                            <h4>BEP20</h4>
+                            <small>رسوم: $0.15</small>
+                        </div>
+                        <div class="option-btn" onclick="selectNetwork('trc20')">
+                            <h4>TRC20</h4>
+                            <small>رسوم: $2.00</small>
+                        </div>
+                        <div class="option-btn" onclick="selectNetwork('erc20')">
+                            <h4>ERC20</h4>
+                            <small>رسوم: $0.30</small>
+                        </div>
+                        <div class="option-btn" onclick="selectNetwork('binance_pay')">
+                            <h4>Binance Pay</h4>
+                            <small>رسوم: $0.00</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="walletAddress">عنوان المحفظة *</label>
+                    <input type="text" id="walletAddress" placeholder="أدخل عنوان محفظتك">
+                </div>
+
+                <div class="form-group">
+                    <label for="buyNotes">ملاحظات (اختياري)</label>
+                    <textarea id="buyNotes" rows="3" placeholder="أي ملاحظات إضافية"></textarea>
+                </div>
+
+                <div class="fee-info" id="buyFeeInfo" style="display: none;">
+                    <h3>💡 تفاصيل الرسوم</h3>
+                    <div id="buyFeeDetails"></div>
+                </div>
+
+                <div style="text-align: center; margin-top: 30px;">
+                    <button class="btn-back btn" onclick="prevStep(3)">⬅️ السابق</button>
+                    <button class="btn" id="buyNextBtn" onclick="nextStep(3)" disabled>التالي ⬅️</button>
+                </div>
+            </div>
+
+            <!-- الخطوة الثالثة ب: تفاصيل البيع -->
+            <div class="step" id="step3sell">
+                <h2 style="text-align: center; margin-bottom: 30px; color: #333;">💸 تفاصيل البيع</h2>
+                
+                <div class="form-group">
+                    <label for="sellUsdtAmount">كمية USDT للبيع *</label>
+                    <input type="number" id="sellUsdtAmount" placeholder="أدخل الكمية" min="1" step="0.01" oninput="calculateSellFees()">
+                </div>
+
+                <div class="form-group">
+                    <label>اختر طريقة الاستلام *</label>
+                    <div class="option-buttons">
+                        <div class="option-btn" onclick="selectPaymentMethod('syriatel')">
+                            <h4>سيريتل كاش</h4>
+                        </div>
+                        <div class="option-btn" onclick="selectPaymentMethod('haram')">
+                            <h4>حوالة الهرم</h4>
+                        </div>
+                        <div class="option-btn" onclick="selectPaymentMethod('bemo')">
+                            <h4>بنك بيمو</h4>
+                        </div>
+                        <div class="option-btn" onclick="selectPaymentMethod('sham')">
+                            <h4>شام كاش</h4>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group" id="accountDetailsGroup" style="display: none;">
+                    <label id="accountDetailsLabel">تفاصيل الحساب *</label>
+                    <input type="text" id="accountDetails" placeholder="">
+                </div>
+
+                <div class="fee-info" id="sellFeeInfo" style="display: none;">
+                    <h3>💡 تفاصيل الرسوم</h3>
+                    <div id="sellFeeDetails"></div>
+                </div>
+
+                <div style="text-align: center; margin-top: 30px;">
+                    <button class="btn-back btn" onclick="prevStep(3)">⬅️ السابق</button>
+                    <button class="btn" id="sellNextBtn" onclick="nextStep(3)" disabled>التالي ⬅️</button>
+                </div>
+            </div>
+
+            <!-- الخطوة الرابعة: تفاصيل الدفع -->
+            <div class="step" id="step4">
+                <h2 style="text-align: center; margin-bottom: 30px; color: #333;">💳 تفاصيل الدفع</h2>
+                
+                <div id="paymentDetails"></div>
+
+                <div style="text-align: center; margin-top: 30px;">
+                    <button class="btn-back btn" onclick="prevStep(4)">⬅️ السابق</button>
+                    <button class="btn" onclick="nextStep(4)">إتمام الطلب ✅</button>
+                </div>
+            </div>
+
+            <!-- الخطوة الخامسة: تأكيد الطلب -->
+            <div class="step" id="step5">
+                <div class="success-message">
+                    <h2>✅ تم إرسال الطلب بنجاح!</h2>
+                    <p>شكراً لك، تم إرسال طلبك وسيتم التواصل معك قريباً</p>
+                </div>
+
+                <div class="summary" id="finalSummary"></div>
+
+                <div class="notice">
+                    <strong>⚠️ ملاحظة مهمة:</strong><br>
+                    عمولة التسديد على طرق التحويل المختلفة بالليرة السورية تقع على المستخدم كما تحددها هذه الجهات
+                </div>
+
+                <div style="text-align: center; margin-top: 30px;">
+                    <button class="btn" onclick="resetForm()">طلب جديد 🔄</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // متغيرات عامة
+        let currentStep = 1;
+        let operationType = '';
+        let selectedNetwork = '';
+        let selectedPaymentMethod = '';
+        let formData = {};
+
+        // تهيئة EmailJS (يمكن للمستخدم إضافة مفاتيح الخدمة الخاصة به)
+        (function() {
+            // emailjs.init("YOUR_PUBLIC_KEY"); // يجب استبدال هذا بالمفتاح الفعلي
+        })();
+
+        // رسوم الشبكات
+        const networkFees = {
+            'bep20': 0.15,
+            'trc20': 2.00,
+            'erc20': 0.30,
+            'binance_pay': 0.00
+        };
+
+        // عناوين الاستلام للشراء
+        const paymentAddresses = {
+            'sham': {
+                address: 'be456e0ea9392db4d68a7093ee317bc8',
+                account: '5991161126028260'
+            },
+            'syriatel': {
+                number: '0934598967'
+            },
+            'haram': {
+                name: 'علي ابراهيم محمود',
+                phone: '0934598967',
+                city: 'اللاذقية'
+            },
+            'bemo': {
+                name: 'علي ابراهيم محمود',
+                account: '060104947910013000000'
+            }
+        };
+
+        // عناوين الكريبتو للبيع
+        const cryptoAddresses = {
+            'bep20': '0x21802218d8d661d66F2C7959347a6382E1cc614F',
+            'trc20': 'TD2LoErPRkVPBxDk72ZErtiyi6agirZQjX',
+            'erc20': '0x21802218d8d661d66F2C7959347a6382E1cc614F',
+            'binance_pay': '969755964'
+        };
+
+        // حساب العمولة
+        function calculateCommission(amount) {
+            if (amount < 100) {
+                return 1.65;
+            } else if (amount <= 5000) {
+                return amount * 0.0165; // 1.65%
+            } else {
+                return amount * 0.01; // 1%
+            }
+        }
+
+        // حساب الرسوم للشراء
+        function calculateFees() {
+            const amount = parseFloat(document.getElementById('usdtAmount').value) || 0;
+            if (amount > 0 && selectedNetwork) {
+                const commission = calculateCommission(amount);
+                const networkFee = networkFees[selectedNetwork];
+                const total = amount + commission + networkFee;
+
+                const feeInfo = document.getElementById('buyFeeInfo');
+                const feeDetails = document.getElementById('buyFeeDetails');
+                
+                feeDetails.innerHTML = `
+                    <div style="text-align: right;">
+                        <p><strong>المبلغ الأساسي:</strong> $${amount.toFixed(2)}</p>
+                        <p><strong>عمولة المنصة:</strong> $${commission.toFixed(2)}</p>
+                        <p><strong>رسوم الشبكة:</strong> $${networkFee.toFixed(2)}</p>
+                        <hr style="margin: 10px 0;">
+                        <p><strong>المجموع الكلي:</strong> $${total.toFixed(2)}</p>
+                    </div>
+                `;
+                feeInfo.style.display = 'block';
+                
+                // تحديث بيانات النموذج
+                formData.amount = amount;
+                formData.commission = commission;
+                formData.networkFee = networkFee;
+                formData.total = total;
+            }
+        }
+
+        // حساب الرسوم للبيع
+        function calculateSellFees() {
+            const amount = parseFloat(document.getElementById('sellUsdtAmount').value) || 0;
+            if (amount > 0) {
+                const commission = calculateCommission(amount);
+                const netAmount = amount - commission;
+
+                const feeInfo = document.getElementById('sellFeeInfo');
+                const feeDetails = document.getElementById('sellFeeDetails');
+                
+                feeDetails.innerHTML = `
+                    <div style="text-align: right;">
+                        <p><strong>المبلغ الأساسي:</strong> $${amount.toFixed(2)}</p>
+                        <p><strong>عمولة المنصة:</strong> -$${commission.toFixed(2)}</p>
+                        <hr style="margin: 10px 0;">
+                        <p><strong>المبلغ الصافي:</strong> $${netAmount.toFixed(2)}</p>
+                    </div>
+                `;
+                feeInfo.style.display = 'block';
+                
+                // تحديث بيانات النموذج
+                formData.amount = amount;
+                formData.commission = commission;
+                formData.netAmount = netAmount;
+            }
+        }
+
+        // اختيار نوع العملية
+        function selectOperation(type) {
+            operationType = type;
+            document.querySelectorAll('#step2 .option-btn').forEach(btn => btn.classList.remove('selected'));
+            event.target.closest('.option-btn').classList.add('selected');
+            document.getElementById('operationNextBtn').disabled = false;
+        }
+
+        // اختيار الشبكة
+        function selectNetwork(network) {
+            selectedNetwork = network;
+            document.querySelectorAll('#step3buy .option-btn').forEach(btn => btn.classList.remove('selected'));
+            event.target.closest('.option-btn').classList.add('selected');
+            calculateFees();
+            validateBuyForm();
+        }
+
+        // اختيار طريقة الدفع
+        function selectPaymentMethod(method) {
+            selectedPaymentMethod = method;
+            document.querySelectorAll('#step3sell .option-btn').forEach(btn => btn.classList.remove('selected'));
+            event.target.closest('.option-btn').classList.add('selected');
+            
+            const accountGroup = document.getElementById('accountDetailsGroup');
+            const accountLabel = document.getElementById('accountDetailsLabel');
+            const accountInput = document.getElementById('accountDetails');
+            
+            if (method === 'bemo') {
+                accountGroup.style.display = 'block';
+                accountLabel.textContent = 'رقم الحساب البنكي *';
+                accountInput.placeholder = 'أدخل رقم حسابك البنكي';
+            } else if (method === 'sham') {
+                accountGroup.style.display = 'block';
+                accountLabel.textContent = 'رقم الحساب أو عنوان الحساب *';
+                accountInput.placeholder = 'أدخل رقم حسابك أو عنوان الحساب';
+            } else {
+                accountGroup.style.display = 'none';
+            }
+            
+            validateSellForm();
+        }
+
+        // التحقق من صحة نموذج الشراء
+        function validateBuyForm() {
+            const amount = document.getElementById('usdtAmount').value;
+            const address = document.getElementById('walletAddress').value;
+            const isValid = amount && selectedNetwork && address;
+            const buyBtn = document.getElementById('buyNextBtn');
+            if (buyBtn) {
+                buyBtn.disabled = !isValid;
+            }
+        }
+
+        // التحقق من صحة نموذج البيع
+        function validateSellForm() {
+            const amount = document.getElementById('sellUsdtAmount').value;
+            const accountDetails = document.getElementById('accountDetails').value;
+            const needsAccount = selectedPaymentMethod === 'bemo' || selectedPaymentMethod === 'sham';
+            const isValid = amount && selectedPaymentMethod && (!needsAccount || accountDetails);
+            document.getElementById('sellNextBtn').disabled = !isValid;
+        }
+
+        // الانتقال للخطوة التالية
+        function nextStep(step) {
+            if (step === 1) {
+                // التحقق من البيانات الشخصية
+                const name = document.getElementById('fullName').value;
+                const phone = document.getElementById('phoneNumber').value;
+                const city = document.getElementById('city').value;
+                
+                if (!name || !phone || !city) {
+                    alert('يرجى ملء جميع البيانات المطلوبة');
+                    return;
+                }
+                
+                formData.name = name;
+                formData.phone = phone;
+                formData.city = city;
+                
+            } else if (step === 2) {
+                if (!operationType) {
+                    alert('يرجى اختيار نوع العملية');
+                    return;
+                }
+                
+                // إظهار النموذج المناسب
+                if (operationType === 'buy') {
+                    document.getElementById('step3buy').style.display = 'block';
+                    document.getElementById('step3sell').style.display = 'none';
+                } else {
+                    document.getElementById('step3buy').style.display = 'none';
+                    document.getElementById('step3sell').style.display = 'block';
+                }
+                
+            } else if (step === 3) {
+                if (operationType === 'buy') {
+                    const amount = document.getElementById('usdtAmount').value;
+                    const address = document.getElementById('walletAddress').value;
+                    const notes = document.getElementById('buyNotes').value;
+                    
+                    if (!amount || !selectedNetwork || !address) {
+                        alert('يرجى ملء جميع البيانات المطلوبة');
+                        return;
+                    }
+                    
+                    formData.walletAddress = address;
+                    formData.notes = notes;
+                    formData.network = selectedNetwork;
+                    
+                    showBuyPaymentDetails();
+                } else {
+                    const amount = document.getElementById('sellUsdtAmount').value;
+                    const accountDetails = document.getElementById('accountDetails').value;
+                    const needsAccount = selectedPaymentMethod === 'bemo' || selectedPaymentMethod === 'sham';
+                    
+                    if (!amount || !selectedPaymentMethod || (needsAccount && !accountDetails)) {
+                        alert('يرجى ملء جميع البيانات المطلوبة');
+                        return;
+                    }
+                    
+                    formData.paymentMethod = selectedPaymentMethod;
+                    if (needsAccount) {
+                        formData.accountDetails = accountDetails;
+                    }
+                    
+                    showSellPaymentDetails();
+                }
+                
+            } else if (step === 4) {
+                // إرسال البيانات وإظهار التأكيد
+                sendEmailAndShowConfirmation();
+            }
+            
+            // إخفاء الخطوة الحالية وإظهار التالية
+            document.getElementById(`step${currentStep}`).classList.remove('active');
+            currentStep++;
+            document.getElementById(`step${currentStep}`).classList.add('active');
+            
+            // تحديث شريط التقدم
+            updateProgress();
+        }
+
+        // العودة للخطوة السابقة
+        function prevStep(step) {
+            document.getElementById(`step${currentStep}`).classList.remove('active');
+            currentStep--;
+            document.getElementById(`step${currentStep}`).classList.add('active');
+            updateProgress();
+        }
+
+        // تحديث شريط التقدم
+        function updateProgress() {
+            const progress = (currentStep / 5) * 100;
+            document.getElementById('progressFill').style.width = `${progress}%`;
+            document.getElementById('stepIndicator').textContent = `الخطوة ${currentStep} من 5`;
+        }
+
+        // إظهار تفاصيل الدفع للشراء
+        function showBuyPaymentDetails() {
+            const paymentDetails = document.getElementById('paymentDetails');
+            let content = '<h3 style="text-align: center; margin-bottom: 20px;">💳 قم بالتحويل إلى:</h3>';
+            
+            // إظهار جميع طرق الدفع المتاحة
+            content += `
+                <div class="option-buttons">
+                    <div class="option-btn" onclick="selectBuyPayment('sham')">
+                        <h4>شام كاش</h4>
+                        <div class="crypto-address">
+                            العنوان: ${paymentAddresses.sham.address}<br>
+                            رقم الحساب: ${paymentAddresses.sham.account}
+                        </div>
+                    </div>
+                    <div class="option-btn" onclick="selectBuyPayment('syriatel')">
+                        <h4>سيريتل كاش</h4>
+                        <div class="crypto-address">
+                            الرقم: ${paymentAddresses.syriatel.number}
+                        </div>
+                    </div>
+                    <div class="option-btn" onclick="selectBuyPayment('haram')">
+                        <h4>حوالة الهرم</h4>
+                        <div class="crypto-address">
+                            الاسم: ${paymentAddresses.haram.name}<br>
+                            الهاتف: ${paymentAddresses.haram.phone}<br>
+                            المدينة: ${paymentAddresses.haram.city}
+                        </div>
+                    </div>
+                    <div class="option-btn" onclick="selectBuyPayment('bemo')">
+                        <h4>بنك بيمو</h4>
+                        <div class="crypto-address">
+                            الاسم: ${paymentAddresses.bemo.name}<br>
+                            رقم الحساب: ${paymentAddresses.bemo.account}
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            paymentDetails.innerHTML = content;
+        }
+
+        // إظهار تفاصيل الدفع للبيع
+        function showSellPaymentDetails() {
+            const paymentDetails = document.getElementById('paymentDetails');
+            let content = '<h3 style="text-align: center; margin-bottom: 20px;">🪙 قم بالإرسال إلى:</h3>';
+            
+            content += `
+                <div class="option-buttons">
+                    <div class="option-btn" onclick="selectSellNetwork('bep20')">
+                        <h4>BEP20</h4>
+                        <div class="crypto-address">${cryptoAddresses.bep20}</div>
+                    </div>
+                    <div class="option-btn" onclick="selectSellNetwork('trc20')">
+                        <h4>TRC20</h4>
+                        <div class="crypto-address">${cryptoAddresses.trc20}</div>
+                    </div>
+                    <div class="option-btn" onclick="selectSellNetwork('erc20')">
+                        <h4>ERC20</h4>
+                        <div class="crypto-address">${cryptoAddresses.erc20}</div>
+                    </div>
+                    <div class="option-btn" onclick="selectSellNetwork('binance_pay')">
+                        <h4>Binance Pay</h4>
+                        <div class="crypto-address">${cryptoAddresses.binance_pay}</div>
+                    </div>
+                </div>
+            `;
+            
+            paymentDetails.innerHTML = content;
+        }
+
+        // اختيار طريقة الدفع للشراء
+        function selectBuyPayment(method) {
+            formData.selectedPaymentMethod = method;
+            document.querySelectorAll('#step4 .option-btn').forEach(btn => btn.classList.remove('selected'));
+            event.target.closest('.option-btn').classList.add('selected');
+        }
+
+        // اختيار شبكة البيع
+        function selectSellNetwork(network) {
+            formData.selectedSellNetwork = network;
+            document.querySelectorAll('#step4 .option-btn').forEach(btn => btn.classList.remove('selected'));
+            event.target.closest('.option-btn').classList.add('selected');
+        }
+
+        // إرسال البريد الإلكتروني وإظهار التأكيد
+        function sendEmailAndShowConfirmation() {
+            // إعداد محتوى البريد الإلكتروني
+            const emailContent = generateEmailContent();
+            
+            // محاولة إرسال البريد الإلكتروني باستخدام EmailJS
+            try {
+                // يمكن للمستخدم تفعيل هذا الكود بعد إعداد EmailJS
+                /*
+                emailjs.send('service_id', 'template_id', {
+                    to_email: 'alimahmoud001a@gmail.com',
+                    subject: 'طلب تحويل عملة رقمية جديد',
+                    message: emailContent,
+                    from_name: formData.name,
+                    from_phone: formData.phone
+                }).then(function(response) {
+                    console.log('Email sent successfully!', response.status, response.text);
+                }, function(error) {
+                    console.log('Failed to send email...', error);
+                });
+                */
+                
+                // طريقة بديلة: إرسال عبر mailto (يفتح برنامج البريد الافتراضي)
+                const subject = encodeURIComponent('طلب تحويل عملة رقمية جديد');
+                const body = encodeURIComponent(emailContent);
+                const mailtoLink = `mailto:alimahmoud001a@gmail.com?subject=${subject}&body=${body}`;
+                
+                // إنشاء رابط مخفي وتفعيله
+                const link = document.createElement('a');
+                link.href = mailtoLink;
+                link.style.display = 'none';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+            } catch (error) {
+                console.log('Email sending error:', error);
+            }
+            
+            // إظهار ملخص الطلب
+            showFinalSummary();
+        }
+
+        // توليد محتوى البريد الإلكتروني
+        function generateEmailContent() {
+            let content = `
+طلب تحويل عملة رقمية جديد
+
+البيانات الشخصية:
+- الاسم: ${formData.name}
+- الهاتف: ${formData.phone}
+- المدينة: ${formData.city}
+
+نوع العملية: ${operationType === 'buy' ? 'شراء' : 'بيع'} USDT
+المبلغ: $${formData.amount}
+العمولة: $${formData.commission.toFixed(2)}
+`;
+
+            if (operationType === 'buy') {
+                content += `
+الشبكة المختارة: ${selectedNetwork.toUpperCase()}
+رسوم الشبكة: $${formData.networkFee.toFixed(2)}
+المجموع الكلي: $${formData.total.toFixed(2)}
+عنوان المحفظة: ${formData.walletAddress}
+طريقة الدفع المختارة: ${formData.selectedPaymentMethod}
+`;
+                if (formData.notes) {
+                    content += `الملاحظات: ${formData.notes}`;
+                }
+            } else {
+                content += `
+المبلغ الصافي: $${formData.netAmount.toFixed(2)}
+طريقة الاستلام: ${selectedPaymentMethod}
+الشبكة المختارة للإرسال: ${formData.selectedSellNetwork}
+`;
+                if (formData.accountDetails) {
+                    content += `تفاصيل الحساب: ${formData.accountDetails}`;
+                }
+            }
+
+            return content;
+        }
+
+        // إظهار الملخص النهائي
+        function showFinalSummary() {
+            const summary = document.getElementById('finalSummary');
+            let content = '<h3>📋 ملخص الطلب</h3>';
+            
+            content += `
+                <div class="summary-item">
+                    <span>الاسم:</span>
+                    <span>${formData.name}</span>
+                </div>
+                <div class="summary-item">
+                    <span>الهاتف:</span>
+                    <span>${formData.phone}</span>
+                </div>
+                <div class="summary-item">
+                    <span>نوع العملية:</span>
+                    <span>${operationType === 'buy' ? 'شراء' : 'بيع'} USDT</span>
+                </div>
+                <div class="summary-item">
+                    <span>المبلغ:</span>
+                    <span>$${formData.amount}</span>
+                </div>
+                <div class="summary-item">
+                    <span>العمولة:</span>
+                    <span>$${formData.commission.toFixed(2)}</span>
+                </div>
+            `;
+            
+            if (operationType === 'buy') {
+                content += `
+                    <div class="summary-item">
+                        <span>رسوم الشبكة:</span>
+                        <span>$${formData.networkFee.toFixed(2)}</span>
+                    </div>
+                    <div class="summary-item">
+                        <span>المجموع الكلي:</span>
+                        <span>$${formData.total.toFixed(2)}</span>
+                    </div>
+                `;
+            } else {
+                content += `
+                    <div class="summary-item">
+                        <span>المبلغ الصافي:</span>
+                        <span>$${formData.netAmount.toFixed(2)}</span>
+                    </div>
+                `;
+            }
+            
+            summary.innerHTML = content;
+        }
+
+        // إعادة تعيين النموذج
+        function resetForm() {
+            currentStep = 1;
+            operationType = '';
+            selectedNetwork = '';
+            selectedPaymentMethod = '';
+            formData = {};
+            
+            // إعادة تعيين جميع الحقول
+            document.querySelectorAll('input, select, textarea').forEach(field => {
+                field.value = '';
+            });
+            
+            // إزالة التحديدات
+            document.querySelectorAll('.option-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            
+            // إخفاء جميع الخطوات وإظهار الأولى
+            document.querySelectorAll('.step').forEach(step => {
+                step.classList.remove('active');
+            });
+            document.getElementById('step1').classList.add('active');
+            
+            // إعادة تعيين شريط التقدم
+            updateProgress();
+            
+            // إخفاء معلومات الرسوم
+            document.getElementById('buyFeeInfo').style.display = 'none';
+            document.getElementById('sellFeeInfo').style.display = 'none';
+            document.getElementById('accountDetailsGroup').style.display = 'none';
+            
+            // إعادة تعيين الأزرار
+            document.getElementById('operationNextBtn').disabled = true;
+            document.getElementById('buyNextBtn').disabled = true;
+            document.getElementById('sellNextBtn').disabled = true;
+        }
+
+        // إضافة مستمعي الأحداث
+        document.getElementById('usdtAmount').addEventListener('input', validateBuyForm);
+        document.getElementById('walletAddress').addEventListener('input', validateBuyForm);
+        document.getElementById('sellUsdtAmount').addEventListener('input', validateSellForm);
+        document.getElementById('accountDetails').addEventListener('input', validateSellForm);
+    </script>
+</body>
+</html>
+
