@@ -202,14 +202,13 @@
 
     <script>
         const exchangeRate = 14500; // مثال: سعر صرف 1 USDT = 14500 ليرة سورية (يمكن تحديثه)
-        const syriatelCashNumber = '0934598967'; // الرقم الخاص بسيريتل كاش
-        const shamCashAccount = '5991161126028260'; // رقم حساب شام كاش
+        const syriatelCashNumber = '0934598967';
+        const shamCashAccount = '5991161126028260';
 
-        // Cryptocurrency deposit addresses (for when user sells to us)
         const cryptoAddresses = {
             bep20: '0x21802218d8d661d66F2C7959347a6382E1cc614F',
             trc20: 'TD2LoErPRkVPBxDk72ZErtiyi6agirZQjX',
-            erc20: '0x21802218d8d661d66F2C7959347a6382E1cc614F', // Note: ERC20 can be expensive, confirm this address is distinct if needed
+            erc20: '0x21802218d8d661d66F2C7959347a6382E1cc614F',
             binancepay: '969755964'
         };
 
@@ -267,7 +266,6 @@
             buyPaymentDetailsOutput.innerHTML = outputHtml;
         }
 
-        // NEW: Function to display crypto address for selling
         function displaySellCryptoAddress() {
             const sendCryptoNetwork = document.getElementById('sendCryptoNetwork').value;
             const sellCryptoAddressOutput = document.getElementById('sellCryptoAddressOutput');
@@ -289,7 +287,7 @@
                 return 1.65;
             } else if (amount >= 100 && amount <= 5000) {
                 return amount * 0.01;
-            } else {
+            } else { // amount > 5000
                 return amount * 0.0005;
             }
         }
@@ -301,7 +299,7 @@
                 case 'bep20':
                     return 0.15;
                 case 'erc20':
-                    return 0.3;
+                    return 0.3; // Corrected as per your last request (0.3 for ERC20, not TRC20 again)
                 case 'binancepay':
                     return 0;
                 default:
@@ -337,7 +335,7 @@
             let networkFee = 0;
             let estimatedLiraAmount = 0;
             let paymentMethodChosen = '';
-            let cryptoNetworkSent = '';
+            let cryptoNetworkChosen = ''; // This will be for the network user chooses to send/receive USDT on
 
             if (transactionType === 'buy') {
                 usdtAmount = parseFloat(document.getElementById('usdtQuantity').value);
@@ -354,25 +352,28 @@
                 transactionFee = calculateTransactionFee(usdtAmount);
                 networkFee = getNetworkFee(network);
                 
+                // When buying, the user sends Lira and receives USDT.
+                // The Lira amount they pay should cover: USDT quantity + service fee (in USDT then converted) + network fee (in USDT then converted)
                 const totalUsdtForConversion = usdtAmount + transactionFee + networkFee;
                 estimatedLiraAmount = totalUsdtForConversion * exchangeRate;
                 paymentMethodChosen = buyPaymentMethod;
+                cryptoNetworkChosen = network; // Network user receives USDT on
 
                 details += `الكمية المطلوبة (USDT): ${usdtAmount}\n`;
-                details += `الشبكة التي ستستقبل عليها: ${network}\n`;
+                details += `الشبكة التي ستستقبل عليها: ${cryptoNetworkChosen}\n`;
                 details += `عنوان المحفظة: ${walletAddress}\n`;
-                details += `طريقة الدفع المختارة: ${paymentMethodChosen}\n`;
+                details += `طريقة الدفع المختارة (بالليرة السورية): ${paymentMethodChosen}\n`;
                 details += `ملاحظة (شراء): ${buyNote || 'لا يوجد'}\n`;
                 details += `\n--- تفاصيل العمولة و المبلغ المطلوب ---\n`;
                 details += `عمولة الخدمة: ${transactionFee.toFixed(2)} USDT\n`;
-                details += `عمولة الشبكة (${network}): ${networkFee.toFixed(2)} USDT\n`;
+                details += `عمولة الشبكة (${cryptoNetworkChosen}): ${networkFee.toFixed(2)} USDT\n`;
                 details += `المبلغ الإجمالي بالليرة السورية المطلوب للدفع (تقريبي): ${estimatedLiraAmount.toFixed(2)} ل.س\n`;
                 details += `(هذا المبلغ يشمل قيمة الـ USDT المطلوبة + عمولة الخدمة + عمولة الشبكة محولة إلى الليرة السورية).\n`;
 
             } else { // sell
                 usdtAmount = parseFloat(document.getElementById('sellQuantity').value);
                 const sellPaymentMethod = document.getElementById('sellPaymentMethod').value;
-                const sendCryptoNetwork = document.getElementById('sendCryptoNetwork').value;
+                const sendCryptoNetwork = document.getElementById('sendCryptoNetwork').value; // Network user sends USDT on
                 const sellNote = document.getElementById('sellNote').value;
 
                 if (!usdtAmount || !sellPaymentMethod || !sendCryptoNetwork) {
@@ -384,11 +385,11 @@
                 
                 estimatedLiraAmount = (usdtAmount - transactionFee) * exchangeRate;
                 paymentMethodChosen = sellPaymentMethod;
-                cryptoNetworkSent = sendCryptoNetwork;
+                cryptoNetworkChosen = sendCryptoNetwork; // Network user sends USDT on
 
                 details += `الكمية المراد بيعها (USDT): ${usdtAmount}\n`;
-                details += `طريقة استلام المبلغ: ${paymentMethodChosen}\n`;
-                details += `شبكة إرسال USDT إلينا: ${cryptoNetworkSent}\n`;
+                details += `طريقة استلام المبلغ (بالليرة السورية): ${paymentMethodChosen}\n`;
+                details += `شبكة إرسال USDT إلينا: ${cryptoNetworkChosen}\n`;
                 details += `ملاحظة (بيع): ${sellNote || 'لا يوجد'}\n`;
                 details += `\n--- تفاصيل العمولة و المبلغ المستلم ---\n`;
                 details += `عمولة الخدمة: ${transactionFee.toFixed(2)} USDT\n`;
