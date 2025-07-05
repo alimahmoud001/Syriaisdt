@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تحويل العملات الرقمية (USDT)</title>
+    <title>خدمة تحويل العملات الرقمية (USDT)</title>
     <style>
         body {
             font-family: 'Arial', sans-serif;
@@ -63,6 +63,7 @@
         input[type="radio"] {
             margin-left: 5px;
             margin-right: 10px;
+            transform: scale(1.2); /* Make radio buttons slightly larger */
         }
         .radio-group label {
             display: inline-block;
@@ -95,8 +96,9 @@
             margin-top: 20px;
             color: #155724;
         }
-        .details-box p {
-            margin: 5px 0;
+        .details-box pre {
+            white-space: pre-wrap; /* Ensures line breaks are respected */
+            font-family: Arial, sans-serif; /* Use a readable font for pre */
         }
         .error {
             color: red;
@@ -110,10 +112,10 @@
             padding: 20px;
             border-radius: 8px;
             margin-top: 30px;
+            text-align: center;
         }
         #result-section h3 {
             color: #0056b3;
-            text-align: center;
             margin-bottom: 15px;
         }
         #result-section pre {
@@ -124,6 +126,7 @@
             word-wrap: break-word;
             font-family: monospace;
             font-size: 14px;
+            text-align: right; /* Align text right for Arabic */
             border: 1px solid #dee2e6;
         }
         .footer-note {
@@ -131,6 +134,24 @@
             color: #666;
             margin-top: 20px;
             text-align: center;
+        }
+        .mailto-link-container {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+        }
+        .mailto-link-container a {
+            display: inline-block;
+            background-color: #28a745;
+            color: white;
+            padding: 12px 25px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 1.1em;
+            transition: background-color 0.3s ease;
+        }
+        .mailto-link-container a:hover {
+            background-color: #218838;
         }
     </style>
 </head>
@@ -172,7 +193,7 @@
                     <div id="buyAmountError" class="error"></div>
                 </div>
                 <div class="form-group">
-                    <label for="buyNetwork">اختر الشبكة:</label>
+                    <label for="buyNetwork">اختر الشبكة التي ستستقبل عليها USDT:</label>
                     <select id="buyNetwork" name="buyNetwork" required>
                         <option value="">-- اختر شبكة --</option>
                         <option value="bep20">BEP20</option>
@@ -190,7 +211,7 @@
                     <textarea id="buyNote" name="buyNote" rows="3"></textarea>
                 </div>
                 <div class="form-group">
-                    <label for="paymentMethodBuy">طريقة الدفع (الليرة السورية):</label>
+                    <label for="paymentMethodBuy">طريقة الدفع (بالليرة السورية):</label>
                     <select id="paymentMethodBuy" name="paymentMethodBuy" required>
                         <option value="">-- اختر طريقة دفع --</option>
                         <option value="sham_cash">شام كاش</option>
@@ -200,8 +221,8 @@
                     </select>
                 </div>
                 <div id="buyPaymentDetails" class="details-box hidden">
-                    <h3>تفاصيل الدفع (يرجى التحويل إلى هذه التفاصيل):</h3>
-                    <p id="buyPaymentDetailsContent"></p>
+                    <h3>يرجى التحويل إلى هذه التفاصيل لإتمام الشراء:</h3>
+                    <pre id="buyPaymentDetailsContent"></pre>
                 </div>
             </div>
 
@@ -213,7 +234,7 @@
                     <div id="sellAmountError" class="error"></div>
                 </div>
                 <div class="form-group">
-                    <label for="receiveMethod">طريقة استلام المبلغ (الليرة السورية):</label>
+                    <label for="receiveMethod">طريقة استلام المبلغ (بالليرة السورية):</label>
                     <select id="receiveMethod" name="receiveMethod" required>
                         <option value="">-- اختر طريقة استلام --</option>
                         <option value="syriatel_cash">سيريتل كاش</option>
@@ -223,7 +244,7 @@
                     </select>
                 </div>
                 <div id="receiveMethodDetails" class="form-group hidden">
-                    <label for="accountDetails">رقم الحساب / عنوان الحساب الخاص بك:</label>
+                    <label for="accountDetails">رقم الحساب / عنوان الحساب الخاص بك لاستلام الليرة السورية:</label>
                     <input type="text" id="accountDetails" name="accountDetails">
                 </div>
                 <div class="form-group">
@@ -231,7 +252,7 @@
                     <textarea id="sellNote" name="sellNote" rows="3"></textarea>
                 </div>
                 <div class="form-group">
-                    <label for="sellNetwork">اختر الشبكة التي سترسل منها USDT:</label>
+                    <label for="sellNetwork">اختر الشبكة التي سترسل منها USDT إلينا:</label>
                     <select id="sellNetwork" name="sellNetwork" required>
                         <option value="">-- اختر شبكة --</option>
                         <option value="bep20">BEP20</option>
@@ -241,8 +262,8 @@
                     </select>
                 </div>
                 <div id="sellCryptoAddress" class="details-box hidden">
-                    <h3>عنوان محفظتنا لاستلام USDT (يرجى إرسال USDT إلى هذا العنوان):</h3>
-                    <p id="sellCryptoAddressContent"></p>
+                    <h3>يرجى إرسال USDT إلى هذا العنوان:</h3>
+                    <pre id="sellCryptoAddressContent"></pre>
                 </div>
             </div>
 
@@ -251,8 +272,12 @@
 
         <div id="result-section" class="hidden">
             <h3>تم إرسال طلبك بنجاح!</h3>
-            <p><strong>تفاصيل طلبك والعمولات:</strong></p>
+            <p><strong>يرجى مراجعة تفاصيل طلبك والعمولات أدناه:</strong></p>
             <pre id="orderDetailsSummary"></pre>
+            <div class="mailto-link-container">
+                <p>الرجاء النقر على الزر أدناه لإرسال تفاصيل طلبك إلينا عبر بريدك الإلكتروني:</p>
+                <a id="sendEmailLink" href="#">إرسال الطلب عبر البريد الإلكتروني</a>
+            </div>
             <p class="footer-note">ملاحظة: عمولة التسديد على طرق التحويل المختلفة بالليرة السورية تقع على المستخدم كما تحددها هذه الجهات.</p>
         </div>
     </div>
@@ -278,19 +303,21 @@
         const orderDetailsSummary = document.getElementById('orderDetailsSummary');
         const buyAmountError = document.getElementById('buyAmountError');
         const sellAmountError = document.getElementById('sellAmountError');
+        const sendEmailLink = document.getElementById('sendEmailLink');
 
         // Exchange rate (example, needs to be updated dynamically in a real app)
-        const USD_TO_SYP_RATE = 15000; // Example rate, please adjust
+        // **هذا السعر هو سعر تقديري، ويجب أن يتم تحديثه ديناميكيًا من مصدر موثوق في تطبيق حقيقي.**
+        const USD_TO_SYP_RATE = 15000; // مثال: 1 USDT = 15000 ل.س
 
-        // Fixed network fees
+        // Fixed network fees (for our side when sending/receiving)
         const NETWORK_FEES = {
-            'trc20': 2,
-            'bep20': 0.15,
-            'erc20': 0.3,
-            'binance_pay': 0
+            'trc20': 2,    // $2 for TRC20
+            'bep20': 0.15, // $0.15 for BEP20
+            'erc20': 0.3,  // $0.3 for ERC20
+            'binance_pay': 0 // $0 for Binance Pay
         };
 
-        // Payment details for buying USDT
+        // Payment details for buying USDT (where user sends SYP)
         const BUY_PAYMENT_DETAILS = {
             'sham_cash': 'عنواني هو: be456e0ea9392db4d68a7093ee317bc8\nرقم الحساب: 5991161126028260',
             'syriatel_cash': 'عنواني: 0934598967',
@@ -298,7 +325,7 @@
             'bank_bemo': 'التفاصيل هي:\nعلي ابراهيم محمود\n060104947910013000000'
         };
 
-        // Crypto addresses for selling USDT
+        // Crypto addresses for selling USDT (where user sends USDT to us)
         const SELL_CRYPTO_ADDRESSES = {
             'bep20': '0x21802218d8d661d66F2C7959347a6382E1cc614F',
             'trc20': 'TD2LoErPRkVPBxDk72ZErtiyi6agirZQjX',
@@ -392,8 +419,10 @@
 
             let amount = 0;
             let network = '';
-            let totalFees = 0;
-            let transactionFeePercentage = 0;
+            let transactionFees = 0; // Our commission
+            let networkFeeFromUs = 0; // Network fee we pay to send USDT
+            let totalUSDTFees = 0; // Total fees in USDT
+            let transactionFeeDescription = '';
             let totalAmountSYP = 0;
 
             if (transactionType === 'buy') {
@@ -404,7 +433,7 @@
                 const paymentMethodBuy = document.getElementById('paymentMethodBuy').value;
 
                 if (isNaN(amount) || amount <= 0) {
-                    buyAmountError.textContent = 'الرجاء إدخال كمية صحيحة.';
+                    buyAmountError.textContent = 'الرجاء إدخال كمية USDT صحيحة.';
                     return;
                 }
                 buyAmountError.textContent = ''; // Clear error
@@ -414,36 +443,33 @@
                 orderDetails += `عنوان محفظة USDT الخاص بالمستخدم: ${usdtAddress}\n`;
                 orderDetails += `ملاحظات الشراء: ${buyNote || 'لا يوجد'}\n`;
                 orderDetails += `طريقة الدفع (الليرة السورية): ${paymentMethodBuy}\n`;
-                orderDetails += `تفاصيل التحويل المطلوبة من المستخدم:\n${BUY_PAYMENT_DETAILS[paymentMethodBuy]}\n`;
+                orderDetails += `\n--- تفاصيل التحويل المطلوبة منك لإتمام الشراء ---\n`;
+                orderDetails += `${BUY_PAYMENT_DETAILS[paymentMethodBuy]}\n`;
 
-                // Calculate transaction fee based on amount
+                // Calculate our commission
                 if (amount < 100) {
-                    totalFees = 1.65; // Fixed $1.65
-                    transactionFeePercentage = null; // Not applicable
+                    transactionFees = 1.65; // Fixed $1.65
+                    transactionFeeDescription = '1.65$ (للمبالغ أقل من 100$)';
                 } else if (amount <= 5000) {
-                    transactionFeePercentage = 0.01; // 1%
-                    totalFees = amount * transactionFeePercentage;
+                    transactionFees = amount * 0.01; // 1%
+                    transactionFeeDescription = '1% من المبلغ';
                 } else { // amount > 5000
-                    transactionFeePercentage = 0.0005; // 0.05%
-                    totalFees = amount * transactionFeePercentage;
+                    transactionFees = amount * 0.0005; // 0.05%
+                    transactionFeeDescription = '0.05% من المبلغ';
                 }
                 
-                // Add network fee if applicable (for sending USDT to user)
-                const networkFee = NETWORK_FEES[network];
-                totalFees += networkFee;
+                // Add network fee we pay to send USDT to user
+                networkFeeFromUs = NETWORK_FEES[network];
+                totalUSDTFees = transactionFees + networkFeeFromUs;
 
-                totalAmountSYP = (amount + totalFees) * USD_TO_SYP_RATE;
+                totalAmountSYP = (amount + totalUSDTFees) * USD_TO_SYP_RATE;
 
                 orderDetails += `\n--- تفاصيل العمولات والتكلفة الإجمالية ---\n`;
-                orderDetails += `سعر الصرف التقديري (1 USDT = ${USD_TO_SYP_RATE} ل.س)\n`;
-                if (transactionFeePercentage !== null) {
-                    orderDetails += `عمولة التحويل (نسبة مئوية): ${transactionFeePercentage * 100}%\n`;
-                } else {
-                     orderDetails += `عمولة التحويل (مبلغ ثابت): $1.65 (للمبالغ أقل من $100)\n`;
-                }
-                orderDetails += `عمولة الشبكة (${network.toUpperCase()}): $${networkFee.toFixed(2)}\n`;
-                orderDetails += `إجمالي عمولة USDT: $${totalFees.toFixed(2)}\n`;
-                orderDetails += `المبلغ الإجمالي المطلوب بالليرة السورية (تقريبي): ${totalAmountSYP.toFixed(2)} ل.س\n`;
+                orderDetails += `سعر الصرف التقديري (1 USDT ≈ ${USD_TO_SYP_RATE} ل.س)\n`;
+                orderDetails += `عمولتنا على التحويل: ${transactionFeeDescription} (تقريبي $${transactionFees.toFixed(2)})\n`;
+                orderDetails += `عمولة الشبكة (${network.toUpperCase()}): $${networkFeeFromUs.toFixed(2)} (ندفعها لإرسال USDT لك)\n`;
+                orderDetails += `إجمالي العمولات بالـ USDT: $${totalUSDTFees.toFixed(2)}\n`;
+                orderDetails += `المبلغ الإجمالي المطلوب تحويله بالليرة السورية (تقريبي): ${totalAmountSYP.toFixed(2)} ل.س\n`;
 
 
             } else { // transactionType === 'sell'
@@ -454,51 +480,44 @@
                 const sellNote = document.getElementById('sellNote').value;
 
                 if (isNaN(amount) || amount <= 0) {
-                    sellAmountError.textContent = 'الرجاء إدخال كمية صحيحة.';
+                    sellAmountError.textContent = 'الرجاء إدخال كمية USDT صحيحة.';
                     return;
                 }
                 sellAmountError.textContent = ''; // Clear error
 
 
                 orderDetails += `الكمية المراد بيعها (USDT): ${amount.toFixed(2)}\n`;
-                orderDetails += `الشبكة التي سيتم الإرسال منها: ${network.toUpperCase()}\n`;
+                orderDetails += `الشبكة التي سيتم الإرسال منها (إلينا): ${network.toUpperCase()}\n`;
                 orderDetails += `طريقة استلام المبلغ: ${receiveMethod}\n`;
                 if (receiveMethod === 'bank_bemo' || receiveMethod === 'sham_cash') {
-                    orderDetails += `تفاصيل حساب الاستلام: ${accountDetails}\n`;
+                    orderDetails += `تفاصيل حساب الاستلام الخاص بك: ${accountDetails}\n`;
                 }
                 orderDetails += `ملاحظات البيع: ${sellNote || 'لا يوجد'}\n`;
-                orderDetails += `عنوان محفظتنا لاستقبال USDT: ${SELL_CRYPTO_ADDRESSES[network]}\n`;
+                orderDetails += `\n--- عنوان محفظتنا لاستقبال USDT ---\n`;
+                orderDetails += `${SELL_CRYPTO_ADDRESSES[network]}\n`;
 
-                // Calculate transaction fee based on amount
+                // Calculate our commission for selling
                 if (amount < 100) {
-                    totalFees = 1.65; // Fixed $1.65
-                    transactionFeePercentage = null; // Not applicable
+                    transactionFees = 1.65; // Fixed $1.65
+                    transactionFeeDescription = '1.65$ (للمبالغ أقل من 100$)';
                 } else if (amount <= 5000) {
-                    transactionFeePercentage = 0.01; // 1%
-                    totalFees = amount * transactionFeePercentage;
+                    transactionFees = amount * 0.01; // 1%
+                    transactionFeeDescription = '1% من المبلغ';
                 } else { // amount > 5000
-                    transactionFeePercentage = 0.0005; // 0.05%
-                    totalFees = amount * transactionFeePercentage;
+                    transactionFees = amount * 0.0005; // 0.05%
+                    transactionFeeDescription = '0.05% من المبلغ';
                 }
+                
+                // Network fee for selling is paid by the user when sending USDT to us.
+                // We don't deduct it from the amount we pay them.
 
-                // Note: Network fee for selling is paid by the user when sending USDT, not deducted by us.
-                // The prompt specified "عمولة التحويل في الشبكات المختلفة هي ... العمولات كلها ثابتة وليست نسب مئوية"
-                // which implies these are *our* processing fees, not blockchain gas fees directly.
-                // So, the network fee here is on the user's side when they send to us.
-                // We calculate what the user *receives* after our commission.
-
-                const amountAfterOurFees = amount - totalFees;
+                const amountAfterOurFees = amount - transactionFees;
                 totalAmountSYP = amountAfterOurFees * USD_TO_SYP_RATE;
 
                 orderDetails += `\n--- تفاصيل العمولات والمبلغ الصافي ---\n`;
-                orderDetails += `سعر الصرف التقديري (1 USDT = ${USD_TO_SYP_RATE} ل.س)\n`;
-                if (transactionFeePercentage !== null) {
-                    orderDetails += `عمولة التحويل (نسبة مئوية): ${transactionFeePercentage * 100}%\n`;
-                } else {
-                     orderDetails += `عمولة التحويل (مبلغ ثابت): $1.65 (للمبالغ أقل من $100)\n`;
-                }
-                orderDetails += `إجمالي عمولة USDT: $${totalFees.toFixed(2)}\n`;
-                orderDetails += `المبلغ الصافي بالـ USDT بعد عمولتنا: $${amountAfterOurFees.toFixed(2)}\n`;
+                orderDetails += `سعر الصرف التقديري (1 USDT ≈ ${USD_TO_SYP_RATE} ل.س)\n`;
+                orderDetails += `عمولتنا على التحويل: ${transactionFeeDescription} (تقريبي $${transactionFees.toFixed(2)})\n`;
+                orderDetails += `المبلغ الصافي بالـ USDT الذي ستحصل عليه بعد عمولتنا: $${amountAfterOurFees.toFixed(2)}\n`;
                 orderDetails += `المبلغ الصافي الذي ستستلمه بالليرة السورية (تقريبي): ${totalAmountSYP.toFixed(2)} ل.س\n`;
             }
 
@@ -507,29 +526,13 @@
             resultSection.classList.remove('hidden');
             cryptoExchangeForm.classList.add('hidden'); // Hide the form
 
-            // Simulate sending email (in a real app, this would be handled by a backend)
-            sendEmail('alimahmoud001a@gmail.com', 'طلب تحويل عملات رقمية جديد', orderDetails);
+            // Prepare mailto link
+            const emailAddress = 'alimahmoud001a@gmail.com';
+            const emailSubject = `طلب تحويل USDT - ${transactionType === 'buy' ? 'شراء' : 'بيع'} من ${fullName}`;
+            // Encode the order details for the mailto body
+            const emailBody = encodeURIComponent(orderDetails);
+            sendEmailLink.href = `mailto:${emailAddress}?subject=${encodeURIComponent(emailSubject)}&body=${emailBody}`;
         });
-
-        // Simple function to simulate email sending (client-side limitation)
-        function sendEmail(to, subject, body) {
-            // In a real application, you would send this data to a backend server.
-            // For example, using fetch API:
-            /*
-            fetch('/api/send-email', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ to, subject, body })
-            })
-            .then(response => response.json())
-            .then(data => console.log('Email simulated successfully:', data))
-            .catch(error => console.error('Error simulating email:', error));
-            */
-            console.log(`Simulating Email Send:\nTo: ${to}\nSubject: ${subject}\nBody:\n${body}`);
-            alert('تم إرسال طلبك بنجاح! (تمت محاكاة إرسال البريد الإلكتروني)');
-        }
     </script>
 </body>
 </html>
