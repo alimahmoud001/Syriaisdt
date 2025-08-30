@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
@@ -243,7 +242,7 @@
         }
         
         /* تحسينات للجوال */
-        @media (max-width: 480px) {
+        @media (max-width: 300px) {
             .container {
                 padding: 8px;
             }
