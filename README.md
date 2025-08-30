@@ -33,52 +33,48 @@
         .container {
             max-width: 800px;
             margin: 0 auto;
-            padding: 15px;
+            padding: 10px;
         }
         
         header {
             background: linear-gradient(135deg, var(--primary-color), #1a2530);
             color: white;
-            padding: 20px;
+            padding: 15px;
             text-align: center;
             border-radius: 10px;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
         
         h1, h2, h3 {
-            margin-bottom: 15px;
+            margin-bottom: 10px;
         }
         
         .card {
             background-color: white;
             border-radius: 10px;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-            padding: 20px;
-            margin-bottom: 20px;
-            transition: transform 0.3s;
-        }
-        
-        .card:hover {
-            transform: translateY(-5px);
+            padding: 15px;
+            margin-bottom: 15px;
         }
         
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
         
         label {
             display: block;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             font-weight: bold;
             color: var(--dark-color);
+            font-size: 14px;
         }
         
         input[type="number"],
         input[type="text"],
         select {
             width: 100%;
-            padding: 14px;
+            padding: 12px;
             border: 1px solid #ddd;
             border-radius: 8px;
             font-size: 16px;
@@ -95,25 +91,23 @@
             background: linear-gradient(135deg, var(--secondary-color), #2980b9);
             color: white;
             border: none;
-            padding: 16px 20px;
+            padding: 14px;
             border-radius: 8px;
             cursor: pointer;
-            font-size: 18px;
+            font-size: 16px;
             width: 100%;
             transition: all 0.3s;
             font-weight: bold;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
         
         button:hover {
             background: linear-gradient(135deg, #2980b9, var(--secondary-color));
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
         }
         
         .result {
             display: none;
-            margin-top: 25px;
-            padding: 20px;
+            margin-top: 20px;
+            padding: 15px;
             background-color: #f8f9fa;
             border-radius: 8px;
             border-right: 4px solid var(--secondary-color);
@@ -123,19 +117,19 @@
         .info-box {
             background-color: #e8f4fd;
             border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 20px;
+            padding: 15px;
+            margin-bottom: 15px;
             border-right: 4px solid var(--secondary-color);
         }
         
         .address-box {
             background-color: #f9f9f9;
-            padding: 15px;
+            padding: 12px;
             border-radius: 8px;
-            margin: 15px 0;
+            margin: 10px 0;
             word-break: break-all;
             font-family: monospace;
-            font-size: 14px;
+            font-size: 12px;
             border: 1px dashed #ccc;
         }
         
@@ -152,11 +146,11 @@
             border: none;
             outline: none;
             cursor: pointer;
-            padding: 16px;
+            padding: 12px;
             transition: 0.3s;
             color: var(--dark-color);
             flex: 1;
-            font-size: 16px;
+            font-size: 14px;
             font-weight: bold;
         }
         
@@ -171,25 +165,19 @@
         
         .tabcontent {
             display: none;
-            padding: 20px;
+            padding: 15px;
             border: 1px solid #ccc;
             border-top: none;
             border-radius: 0 0 8px 8px;
             background-color: white;
         }
         
-        .commission-notice {
-            font-size: 14px;
-            color: #666;
-            margin-top: 8px;
-        }
-        
         footer {
             text-align: center;
-            margin-top: 30px;
+            margin-top: 20px;
             color: #666;
-            font-size: 14px;
-            padding: 20px;
+            font-size: 12px;
+            padding: 15px;
             background-color: white;
             border-radius: 10px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
@@ -206,23 +194,23 @@
         }
         
         .final-notice {
-            margin-top: 20px;
-            padding: 15px;
+            margin-top: 15px;
+            padding: 12px;
             background-color: #fff3cd;
             border-radius: 8px;
             border-right: 4px solid #ffc107;
-            font-size: 15px;
+            font-size: 14px;
             text-align: center;
         }
         
         .loader {
             display: none;
-            border: 5px solid #f3f3f3;
+            border: 4px solid #f3f3f3;
             border-radius: 50%;
-            border-top: 5px solid var(--secondary-color);
-            width: 50px;
-            height: 50px;
-            margin: 20px auto;
+            border-top: 4px solid var(--secondary-color);
+            width: 40px;
+            height: 40px;
+            margin: 15px auto;
             animation: spin 1s linear infinite;
         }
         
@@ -230,9 +218,9 @@
             display: none;
             color: var(--success-color);
             text-align: center;
-            margin-top: 15px;
+            margin-top: 12px;
             font-weight: bold;
-            font-size: 16px;
+            font-size: 14px;
         }
         
         @keyframes spin {
@@ -247,68 +235,55 @@
         
         .copy-btn {
             background: linear-gradient(135deg, #7d7d7d, #5d5d5d);
-            padding: 10px;
-            font-size: 14px;
-            margin-top: 10px;
+            padding: 8px;
+            font-size: 12px;
+            margin-top: 8px;
             width: auto;
             display: inline-block;
         }
         
-        .copy-btn:hover {
-            background: linear-gradient(135deg, #5d5d5d, #7d7d7d);
-        }
-        
         /* تحسينات للجوال */
-        @media (max-width: 768px) {
+        @media (max-width: 480px) {
             .container {
-                padding: 10px;
+                padding: 8px;
             }
             
             header {
-                padding: 15px;
+                padding: 12px;
             }
             
             h1 {
-                font-size: 24px;
+                font-size: 18px;
             }
             
             .card {
-                padding: 15px;
+                padding: 12px;
             }
             
             input[type="number"],
             input[type="text"],
             select {
-                padding: 12px;
-            }
-            
-            button {
-                padding: 14px;
-                font-size: 16px;
-            }
-            
-            .tab button {
-                padding: 14px;
+                padding: 10px;
                 font-size: 14px;
             }
             
-            .address-box {
-                font-size: 12px;
+            button {
                 padding: 12px;
-            }
-        }
-        
-        @media (max-width: 480px) {
-            header h1 {
-                font-size: 20px;
+                font-size: 14px;
             }
             
-            .tab {
-                flex-direction: column;
+            .tab button {
+                padding: 10px;
+                font-size: 12px;
+            }
+            
+            .address-box {
+                font-size: 11px;
+                padding: 10px;
             }
             
             .info-box {
-                padding: 15px;
+                padding: 12px;
             }
         }
     </style>
@@ -366,13 +341,13 @@
                         <div class="address-box">be456e0ea9392db4d68a7093ee317bc8</div>
                         <button class="copy-btn" onclick="copyToClipboard('be456e0ea9392db4d68a7093ee317bc8')"><i class="fas fa-copy"></i> نسخ العنوان</button>
                         
-                        <p style="margin-top: 15px;">
+                        <p style="margin-top: 12px;">
                             <i class="fas fa-comment"></i> بعد التحويل، يرجى إرسال صورة لقطة الشاشة إلى الدعم على Telegram: 
                             <a href="https://t.me/ali0619000" class="telegram-link" target="_blank">@ali0619000</a>
                         </p>
                     </div>
                     
-                    <button onclick="sendToTelegram('buy')" style="margin-top: 15px; background: linear-gradient(135deg, #0088cc, #005c8a);">
+                    <button onclick="sendToTelegram('buy')" style="margin-top: 12px; background: linear-gradient(135deg, #0088cc, #005c8a);">
                         <i class="fab fa-telegram"></i> إرسال الطلب إلى Telegram
                     </button>
                 </div>
@@ -413,14 +388,14 @@
                         <div class="address-box">0x2F1A184B6abBb49De547D539eDC3b5eAdc3E01F9</div>
                         <button class="copy-btn" onclick="copyToClipboard('0x2F1A184B6abBb49De547D539eDC3b5eAdc3E01F9')"><i class="fas fa-copy"></i> نسخ العنوان</button>
                         
-                        <p style="margin-top: 15px;">
+                        <p style="margin-top: 12px;">
                             <i class="fas fa-comment"></i> بعد التحويل، يرجى إرسال صورة لقطة الشاشة إلى الدعم على Telegram: 
                             <a href="https://t.me/ali0619000" class="telegram-link" target="_blank">@ali0619000</a>
                         </p>
                         <p><i class="fas fa-clock"></i> سيتم إرسال المبلغ خلال عدة دقائق بعد التأكد من التحويل.</p>
                     </div>
                     
-                    <button onclick="sendToTelegram('sell')" style="margin-top: 15px; background: linear-gradient(135deg, #0088cc, #005c8a);">
+                    <button onclick="sendToTelegram('sell')" style="margin-top: 12px; background: linear-gradient(135deg, #0088cc, #005c8a);">
                         <i class="fab fa-telegram"></i> إرسال الطلب إلى Telegram
                     </button>
                 </div>
@@ -445,6 +420,8 @@
     <script>
         // سعر الصرف الثابت
         const exchangeRate = 11000; // 1 USD = 11000 SYP
+        const botToken = "8126453870:AAHKpVDTFA5R5SHcYQVldkNlQp83PKlxeio";
+        const chatId = "@shamcashusdt1"; // مجموعة التلجرام
         
         // فتح التبويبات
         function openTab(evt, tabName) {
@@ -566,8 +543,8 @@
             localStorage.setItem('currentTransaction', JSON.stringify(transactionData));
         });
         
-        // إرسال البيانات إلى Telegram
-        function sendToTelegram(type) {
+        // إرسال البيانات إلى Telegram باستخدام التوكن المباشر
+        async function sendToTelegram(type) {
             const transactionData = JSON.parse(localStorage.getItem('currentTransaction'));
             if (!transactionData) {
                 alert('لا يوجد بيانات لإرسالها. يرجى تعبئة النموذج أولاً.');
@@ -589,25 +566,26 @@
             message += `*الوقت:* ${transactionData.timestamp}%0A%0A`;
             message += `*رسالة تذكير:* عند تحويل المبلغ سوف يتم اعتماد سعر صرف الدولار كما هو سعر الصرف في البنك المركزي.`;
             
-            // إرسال الطلب إلى مجموعة التلجرام باستخدام Webhook
-            // ملاحظة: هذا مثال، تحتاج إلى استبدال الرابط برابط Webhook الخاص بك
-            const webhookURL = 'https://api.telegram.org/botYOUR_BOT_TOKEN/sendMessage?chat_id=@shamcashusdt1&text=';
-            
-            // محاكاة إرسال البيانات (لأننا لا نستطيع إجراء طلبات بين المصادر من المتصفح مباشرة)
-            // في التطبيق الحقيقي، ستحتاج إلى استخدام خدمة وسيطة أو تطبيق ويب خاص
-            setTimeout(function() {
-                document.getElementById('loader').style.display = 'none';
-                document.getElementById('successMessage').style.display = 'block';
+            try {
+                // إرسال الطلب إلى مجموعة التلجرام باستخدام API
+                const response = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${message}&parse_mode=Markdown`);
+                const data = await response.json();
                 
-                // فتح رابط التلجرام مع نص الرسالة (حل بديل)
+                if (data.ok) {
+                    document.getElementById('loader').style.display = 'none';
+                    document.getElementById('successMessage').style.display = 'block';
+                } else {
+                    throw new Error('فشل في الإرسال');
+                }
+            } catch (error) {
+                document.getElementById('loader').style.display = 'none';
+                alert('حدث خطأ في الإرسال. يرجى المحاولة مرة أخرى أو التواصل مع الدعم.');
+                console.error('Error sending to Telegram:', error);
+                
+                // فتح رابط التلجرام مع نص الرسالة كحل بديل
                 window.open(`https://t.me/share/url?url=&text=${message}`, '_blank');
-            }, 2000);
+            }
         }
-        
-        // جعل التطبيق متجاوباً مع الأجهزة المحمولة
-        window.addEventListener('resize', function() {
-            // تحديث الواجهة عند تغيير حجم الشاشة
-        });
     </script>
 </body>
 </html>
