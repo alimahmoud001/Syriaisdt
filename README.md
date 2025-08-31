@@ -1,3 +1,4 @@
+الحمد لله الذي بنعمته تتم الصالحات 
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
@@ -218,6 +219,27 @@
             font-size: 13px;
             display: none;
         }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 10px 0;
+        }
+        
+        .loading-spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body>
@@ -236,6 +258,10 @@
 
         <div class="form-container">
             <div class="error-message" id="error-message"></div>
+            <div class="loading" id="loading">
+                <div class="loading-spinner"></div>
+                <p>جاري إرسال الطلب...</p>
+            </div>
             
             <div class="form-group">
                 <label for="name">الاسم بالكامل</label>
@@ -341,6 +367,7 @@
             const countdownEl = document.getElementById('countdown');
             const successMessage = document.getElementById('success-message');
             const errorMessage = document.getElementById('error-message');
+            const loadingEl = document.getElementById('loading');
             
             // إعدادات Telegram
             const BOT_TOKEN = "8126453870:AAHKpVDTFA5R5SHcYQVldkNlQp83PKlxeio";
@@ -417,12 +444,19 @@
                     return false;
                 }
                 
+                // التحقق من صحة البريد الإلكتروني
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(email)) {
+                    showError('يرجى إدخال بريد إلكتروني صحيح');
+                    return false;
+                }
+                
                 if (buySection.classList.contains('active')) {
                     const buyAmount = document.getElementById('buy-amount').value.trim();
                     const networkAddress = document.getElementById('network-address').value.trim();
                     
-                    if (!buyAmount) {
-                        showError('يرجى إدخال المبلغ المراد شراؤه');
+                    if (!buyAmount || buyAmount <= 0) {
+                        showError('يرجى إدخال مبلغ صحيح للشراء');
                         return false;
                     }
                     
@@ -430,12 +464,18 @@
                         showError('يرجى إدخال عنوان الشبكة');
                         return false;
                     }
+                    
+                    // التحقق من أن العنوان يحتوي على أحرف وأرقام فقط (تبسيطاً)
+                    if (!/^[a-zA-Z0-9]+$/.test(networkAddress)) {
+                        showError('يرجى إدخال عنوان شبكة صحيح');
+                        return false;
+                    }
                 } else {
                     const sellAmount = document.getElementById('sell-amount').value.trim();
                     const shamAddress = document.getElementById('sham-address').value.trim();
                     
-                    if (!sellAmount) {
-                        showError('يرجى إدخال المبلغ المراد بيعه');
+                    if (!sellAmount || sellAmount <= 0) {
+                        showError('يرجى إدخال مبلغ صحيح للبيع');
                         return false;
                     }
                     
@@ -452,21 +492,26 @@
             function showError(message) {
                 errorMessage.textContent = message;
                 errorMessage.style.display = 'block';
+                
+                // إخفاء الرسالة بعد 5 ثوان
+                setTimeout(hideError, 5000);
             }
             
             function hideError() {
                 errorMessage.style.display = 'none';
             }
             
-            // إرسال الرسالة إلى Telegram
+            // إرسال الرسالة إلى Telegram باستخدام Webhook البديل
             async function sendToTelegram(message) {
-                const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
+                // استخدام proxy لتجنب مشاكل CORS
+                const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
+                const apiUrl = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
                 
                 try {
-                    const response = await fetch(url, {
+                    const response = await fetch(proxyUrl + apiUrl, {
                         method: 'POST',
                         headers: {
-                            'Content-Type': 'application/json'
+                            'Content-Type': 'application/json',
                         },
                         body: JSON.stringify({
                             chat_id: CHAT_ID,
@@ -479,7 +524,27 @@
                     return data.ok;
                 } catch (error) {
                     console.error('Error sending message to Telegram:', error);
-                    return false;
+                    
+                    // محاولة بديلة بدون proxy
+                    try {
+                        const response = await fetch(apiUrl, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                chat_id: CHAT_ID,
+                                text: message,
+                                parse_mode: 'HTML'
+                            })
+                        });
+                        
+                        const data = await response.json();
+                        return data.ok;
+                    } catch (secondError) {
+                        console.error('Second attempt failed:', secondError);
+                        return false;
+                    }
                 }
             }
             
@@ -493,6 +558,10 @@
                 if (!validateForm()) {
                     return;
                 }
+                
+                // إظهار تحميل
+                loadingEl.style.display = 'block';
+                submitBtn.disabled = true;
                 
                 // جمع البيانات
                 const name = document.getElementById('name').value.trim();
@@ -531,6 +600,9 @@
                 // إرسال البيانات إلى Telegram
                 const success = await sendToTelegram(message);
                 
+                // إخفاء تحميل
+                loadingEl.style.display = 'none';
+                
                 if (success) {
                     // حفظ وقت الإرسال الأخير
                     localStorage.setItem('lastSubmitTime', new Date().getTime());
@@ -539,25 +611,16 @@
                     successMessage.style.display = 'block';
                     submitBtn.disabled = true;
                     
-                    // إعادة تعيين النموذج بعد 3 ثوان
+                    // إعادة تعيين النموذج بعد 5 ثوان
                     setTimeout(function() {
                         document.querySelectorAll('input').forEach(input => input.value = '');
                         successMessage.style.display = 'none';
                         updateCountdown();
-                    }, 3000);
+                    }, 5000);
                 } else {
-                    showError('حدث خطأ أثناء إرسال الطلب. يرجى المحاولة مرة أخرى.');
+                    showError('حدث خطأ أثناء إرسال الطلب. يرجى المحاولة مرة أخرى أو التواصل مع الدعم.');
+                    submitBtn.disabled = false;
                 }
-            });
-            
-            // التحقق من الوقت عند تحميل الصفحة
-            updateCountdown();
-        });
-    </script>
-</body>
-</html>                    successMessage.style.display = 'none';
-                    updateCountdown();
-                }, 3000);
             });
             
             // التحقق من الوقت عند تحميل الصفحة
