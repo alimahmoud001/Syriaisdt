@@ -31,7 +31,7 @@
         }
         
         .container {
-            max-width: 800px;
+            max-width: 380px;
             margin: 0 auto;
             padding: 10px;
         }
@@ -628,7 +628,7 @@
             message += `*المبلغ الإجمالي:* ${transactionData.total} ${transactionData.currency === 'usd' ? '$' : 'SYP'}%0A`;
             message += `*العنوان:* ${transactionData.address}%0A`;
             message += `*الوقت:* ${transactionData.timestamp}%0A%0A`;
-            message += `*رسالة تذكير:* عند تحويل المبلغ سوف يتم اعتماد سعر صرف الدولار كما هو سعر الصرف في البنك المركزي.`;
+            message += `*رسالة تذكير:* شكرا لانتظارك.`;
             
             try {
                 // إرسال الطلب إلى مجموعة التلجرام باستخدام API
