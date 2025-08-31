@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
@@ -32,7 +31,7 @@
         }
         
         .container {
-            max-width: 800px;
+            max-width: 380px;
             margin: 0 auto;
             padding: 10px;
         }
