@@ -1,4 +1,4 @@
-الحمد لله الذي بنعمته تتم الصالحات 
+الحمد لله الذي بنعمته تمت البيع لله 
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
@@ -371,7 +371,7 @@
             
             // إعدادات Telegram
             const BOT_TOKEN = "8126453870:AAHKpVDTFA5R5SHcYQVldkNlQp83PKlxeio";
-            const CHAT_ID = "8364537821";
+            const CHAT_ID = "8126453870";
             
             // التبديل بين شراء وبيع
             buyBtn.addEventListener('click', function() {
