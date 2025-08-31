@@ -208,6 +208,16 @@
             text-align: center;
             display: none;
         }
+        
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 10px;
+            border-radius: 6px;
+            margin: 10px 0;
+            font-size: 13px;
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -225,6 +235,8 @@
         </header>
 
         <div class="form-container">
+            <div class="error-message" id="error-message"></div>
+            
             <div class="form-group">
                 <label for="name">الاسم بالكامل</label>
                 <input type="text" id="name" placeholder="أدخل اسمك بالكامل">
@@ -254,7 +266,7 @@
 
                 <div class="form-group">
                     <label for="network-address">عنوان الشبكة (BEP20)</label>
-                    <input type="text" id="network-address" placeholder="أدعنوان الشبكة BEP20">
+                    <input type="text" id="network-address" placeholder="أدخل عنوان الشبكة BEP20">
                 </div>
 
                 <div class="form-group">
@@ -315,7 +327,7 @@
         </div>
 
         <footer>
-            <p>جميع الحقوق محفوظة © 2023 | نظام بيع وشراء USDT</p>
+            <p>جميع الحقوق محفوظة © 2025 | نظام بيع وشراء USDT</p>
         </footer>
     </div>
 
@@ -328,6 +340,11 @@
             const submitBtn = document.getElementById('submit-btn');
             const countdownEl = document.getElementById('countdown');
             const successMessage = document.getElementById('success-message');
+            const errorMessage = document.getElementById('error-message');
+            
+            // إعدادات Telegram
+            const BOT_TOKEN = "8126453870:AAHKpVDTFA5R5SHcYQVldkNlQp83PKlxeio";
+            const CHAT_ID = "8364537821";
             
             // التبديل بين شراء وبيع
             buyBtn.addEventListener('click', function() {
@@ -379,27 +396,166 @@
                 }
             }
             
+            // التحقق من صحة البيانات
+            function validateForm() {
+                const name = document.getElementById('name').value.trim();
+                const phone = document.getElementById('phone').value.trim();
+                const email = document.getElementById('email').value.trim();
+                
+                if (!name) {
+                    showError('يرجى إدخال الاسم بالكامل');
+                    return false;
+                }
+                
+                if (!phone) {
+                    showError('يرجى إدخال رقم الهاتف');
+                    return false;
+                }
+                
+                if (!email) {
+                    showError('يرجى إدخال البريد الإلكتروني');
+                    return false;
+                }
+                
+                if (buySection.classList.contains('active')) {
+                    const buyAmount = document.getElementById('buy-amount').value.trim();
+                    const networkAddress = document.getElementById('network-address').value.trim();
+                    
+                    if (!buyAmount) {
+                        showError('يرجى إدخال المبلغ المراد شراؤه');
+                        return false;
+                    }
+                    
+                    if (!networkAddress) {
+                        showError('يرجى إدخال عنوان الشبكة');
+                        return false;
+                    }
+                } else {
+                    const sellAmount = document.getElementById('sell-amount').value.trim();
+                    const shamAddress = document.getElementById('sham-address').value.trim();
+                    
+                    if (!sellAmount) {
+                        showError('يرجى إدخال المبلغ المراد بيعه');
+                        return false;
+                    }
+                    
+                    if (!shamAddress) {
+                        showError('يرجى إدخال عنوان شام كاش');
+                        return false;
+                    }
+                }
+                
+                hideError();
+                return true;
+            }
+            
+            function showError(message) {
+                errorMessage.textContent = message;
+                errorMessage.style.display = 'block';
+            }
+            
+            function hideError() {
+                errorMessage.style.display = 'none';
+            }
+            
+            // إرسال الرسالة إلى Telegram
+            async function sendToTelegram(message) {
+                const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
+                
+                try {
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            chat_id: CHAT_ID,
+                            text: message,
+                            parse_mode: 'HTML'
+                        })
+                    });
+                    
+                    const data = await response.json();
+                    return data.ok;
+                } catch (error) {
+                    console.error('Error sending message to Telegram:', error);
+                    return false;
+                }
+            }
+            
             // إرسال الطلب
-            submitBtn.addEventListener('click', function() {
+            submitBtn.addEventListener('click', async function() {
                 if (!canSubmit()) {
                     updateCountdown();
                     return;
                 }
                 
-                // هنا يجب إضافة الكود لإرسال البيانات إلى Telegram
-                // باستخدام معرف المحادثة والتوكن الم provided
+                if (!validateForm()) {
+                    return;
+                }
                 
-                // حفظ وقت الإرسال الأخير
-                localStorage.setItem('lastSubmitTime', new Date().getTime());
+                // جمع البيانات
+                const name = document.getElementById('name').value.trim();
+                const phone = document.getElementById('phone').value.trim();
+                const email = document.getElementById('email').value.trim();
                 
-                // عرض رسالة النجاح
-                successMessage.style.display = 'block';
-                submitBtn.disabled = true;
+                let message = `<b>طلب جديد</b>\n`;
+                message += `👤 <b>الاسم:</b> ${name}\n`;
+                message += `📞 <b>الهاتف:</b> ${phone}\n`;
+                message += `📧 <b>البريد الإلكتروني:</b> ${email}\n\n`;
                 
-                // إعادة تعيين النموذج بعد 3 ثوان
-                setTimeout(function() {
-                    document.querySelectorAll('input').forEach(input => input.value = '');
-                    successMessage.style.display = 'none';
+                if (buySection.classList.contains('active')) {
+                    const buyAmount = document.getElementById('buy-amount').value.trim();
+                    const networkAddress = document.getElementById('network-address').value.trim();
+                    const currencyType = document.getElementById('currency-type').value;
+                    const currencyText = currencyType === 'syp' ? 'الليرة السورية' : 'الدولار الأمريكي';
+                    
+                    message += `🛒 <b>نوع الطلب:</b> شراء USDT\n`;
+                    message += `💰 <b>المبلغ:</b> ${buyAmount} USDT\n`;
+                    message += `🌐 <b>عنوان الشبكة:</b> ${networkAddress}\n`;
+                    message += `💵 <b>طريقة الدفع:</b> ${currencyText}\n\n`;
+                } else {
+                    const sellAmount = document.getElementById('sell-amount').value.trim();
+                    const shamAddress = document.getElementById('sham-address').value.trim();
+                    const receiveCurrency = document.getElementById('receive-currency').value;
+                    const currencyText = receiveCurrency === 'syp' ? 'الليرة السورية' : 'الدولار الأمريكي';
+                    
+                    message += `🛒 <b>نوع الطلب:</b> بيع USDT\n`;
+                    message += `💰 <b>المبلغ:</b> ${sellAmount} USDT\n`;
+                    message += `📫 <b>عنوان شام كاش:</b> ${shamAddress}\n`;
+                    message += `💵 <b>طريقة الاستلام:</b> ${currencyText}\n\n`;
+                }
+                
+                message += `📝 <b>ملاحظة:</b> عند تحويل المبلغ سوف يتم اعتماد سعر صرف الدولار كما هو سعر الصرف في البنك المركزي`;
+                
+                // إرسال البيانات إلى Telegram
+                const success = await sendToTelegram(message);
+                
+                if (success) {
+                    // حفظ وقت الإرسال الأخير
+                    localStorage.setItem('lastSubmitTime', new Date().getTime());
+                    
+                    // عرض رسالة النجاح
+                    successMessage.style.display = 'block';
+                    submitBtn.disabled = true;
+                    
+                    // إعادة تعيين النموذج بعد 3 ثوان
+                    setTimeout(function() {
+                        document.querySelectorAll('input').forEach(input => input.value = '');
+                        successMessage.style.display = 'none';
+                        updateCountdown();
+                    }, 3000);
+                } else {
+                    showError('حدث خطأ أثناء إرسال الطلب. يرجى المحاولة مرة أخرى.');
+                }
+            });
+            
+            // التحقق من الوقت عند تحميل الصفحة
+            updateCountdown();
+        });
+    </script>
+</body>
+</html>                    successMessage.style.display = 'none';
                     updateCountdown();
                 }, 3000);
             });
