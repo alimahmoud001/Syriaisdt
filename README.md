@@ -785,10 +785,10 @@
             message += `*المبلغ:* ${transactionData.amount} USDT%0A`;
             message += `*طريقة الدفع/الاستلام:* ${transactionData.currency === 'usd' ? 'دولار أمريكي' : 'ليرة سورية'}%0A`;
             message += `*العمولة:* ${transactionData.commission.toFixed(2)} $%0A`;
-            message += `*المبلغ الإجمالي:* ${transactionData.total} ${transactionData.currency === 'usd' ? '$' : 'SYP'}%0A`;
+            message += `*المبلغ الإجمالي:* ${transactionData.total} ${transactionData.currency === 'usd' ? '$' : 'ليرة سورية'}%0A`;
             message += `*العنوان:* ${transactionData.address}%0A`;
             message += `*الوقت:* ${transactionData.timestamp}%0A%0A`;
-            message += `*رسالة تذكير:* عند تحويل المبلغ سوف يتم اعتماد سعر صرف الدولار كما هو سعر الصرف في البنك المركزي.`;
+            message += `*لأي اسفسار التواصل مع الدعم @ali0619000.`;
             
             try {
                 // إرسال الطلب إلى مجموعة التلجرام باستخدام API
