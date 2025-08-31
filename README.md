@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
@@ -12,6 +13,7 @@
             --light-color: #ecf0f1;
             --dark-color: #2c3e50;
             --success-color: #27ae60;
+            --warning-color: #f39c12;
         }
         
         * {
@@ -69,8 +71,10 @@
             font-size: 14px;
         }
         
-        input[type="number"],
         input[type="text"],
+        input[type="number"],
+        input[type="email"],
+        input[type="tel"],
         select {
             width: 100%;
             padding: 12px;
@@ -101,6 +105,11 @@
         
         button:hover {
             background: linear-gradient(135deg, #2980b9, var(--secondary-color));
+        }
+        
+        button:disabled {
+            background: #cccccc;
+            cursor: not-allowed;
         }
         
         .result {
@@ -222,6 +231,24 @@
             font-size: 14px;
         }
         
+        .error-message {
+            display: none;
+            color: var(--accent-color);
+            text-align: center;
+            margin-top: 12px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        
+        .timer-message {
+            display: none;
+            color: var(--warning-color);
+            text-align: center;
+            margin-top: 12px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
@@ -241,8 +268,19 @@
             display: inline-block;
         }
         
+        .user-info {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            border-right: 4px solid #ddd;
+        }
+        
         /* تحسينات للجوال */
-        @media (max-width: 300px) {
+        @media (max-width: 480px) {
             .container {
                 padding: 8px;
             }
@@ -259,8 +297,10 @@
                 padding: 12px;
             }
             
-            input[type="number"],
             input[type="text"],
+            input[type="number"],
+            input[type="email"],
+            input[type="tel"],
             select {
                 padding: 10px;
                 font-size: 14px;
@@ -284,6 +324,21 @@
             .info-box {
                 padding: 12px;
             }
+            
+            .user-info {
+                grid-template-columns: 1fr;
+                padding: 12px;
+            }
+        }
+        
+        @media (min-width: 768px) {
+            .user-info {
+                grid-template-columns: 1fr 1fr;
+            }
+            
+            .user-info .form-group:last-child {
+                grid-column: span 2;
+            }
         }
     </style>
 </head>
@@ -298,6 +353,23 @@
                 <h3><i class="fas fa-info-circle"></i> معلومات مهمة</h3>
                 <p><i class="fas fa-dollar-sign"></i> سعر صرف الدولار: <strong>11000</strong> ليرة سورية</p>
                 <p><i class="fas fa-percentage"></i> العمولة: 1$ + 0.5% من المبلغ الإجمالي</p>
+            </div>
+            
+            <div class="user-info">
+                <div class="form-group">
+                    <label for="userName"><i class="fas fa-user"></i> الاسم الكامل:</label>
+                    <input type="text" id="userName" required placeholder="أدخل اسمك الكامل">
+                </div>
+                
+                <div class="form-group">
+                    <label for="userPhone"><i class="fas fa-phone"></i> رقم الهاتف:</label>
+                    <input type="tel" id="userPhone" required placeholder="أدخل رقم هاتفك">
+                </div>
+                
+                <div class="form-group">
+                    <label for="userEmail"><i class="fas fa-envelope"></i> البريد الإلكتروني:</label>
+                    <input type="email" id="userEmail" required placeholder="أدخل بريدك الإلكتروني">
+                </div>
             </div>
             
             <div class="tab">
@@ -346,7 +418,7 @@
                         </p>
                     </div>
                     
-                    <button onclick="sendToTelegram('buy')" style="margin-top: 12px; background: linear-gradient(135deg, #0088cc, #005c8a);">
+                    <button id="sendBuyButton" onclick="sendToTelegram('buy')" style="margin-top: 12px; background: linear-gradient(135deg, #0088cc, #005c8a);">
                         <i class="fab fa-telegram"></i> إرسال الطلب إلى Telegram
                     </button>
                 </div>
@@ -394,7 +466,7 @@
                         <p><i class="fas fa-clock"></i> سيتم إرسال المبلغ خلال عدة دقائق بعد التأكد من التحويل.</p>
                     </div>
                     
-                    <button onclick="sendToTelegram('sell')" style="margin-top: 12px; background: linear-gradient(135deg, #0088cc, #005c8a);">
+                    <button id="sendSellButton" onclick="sendToTelegram('sell')" style="margin-top: 12px; background: linear-gradient(135deg, #0088cc, #005c8a);">
                         <i class="fab fa-telegram"></i> إرسال الطلب إلى Telegram
                     </button>
                 </div>
@@ -410,6 +482,14 @@
             <i class="fas fa-check-circle"></i> تم إرسال الطلب بنجاح إلى المجموعة!
         </div>
         
+        <div class="error-message" id="errorMessage">
+            <i class="fas fa-exclamation-triangle"></i> حدث خطأ في الإرسال. يرجى المحاولة مرة أخرى.
+        </div>
+        
+        <div class="timer-message" id="timerMessage">
+            <i class="fas fa-clock"></i> يجب الانتظار <span id="countdown">10:00</span> دقائق قبل إرسال طلب جديد.
+        </div>
+        
         <footer>
             <p><i class="fas fa-headset"></i> لأي استفسار، يرجى التواصل مع الدعم على Telegram: <a href="https://t.me/ali0619000" class="telegram-link" target="_blank">@ali0619000</a></p>
             <p><i class="fab fa-telegram"></i> سيتم إرسال التفاصيل إلى مجموعة Telegram: <a href="https://t.me/shamcashusdt1" class="telegram-link" target="_blank">@shamcashusdt1</a></p>
@@ -421,6 +501,7 @@
         const exchangeRate = 11000; // 1 USD = 11000 SYP
         const botToken = "8126453870:AAHKpVDTFA5R5SHcYQVldkNlQp83PKlxeio";
         const chatId = "@shamcashusdt1"; // مجموعة التلجرام
+        const cooldownPeriod = 10 * 60 * 1000; // 10 دقائق بالميلي ثانية
         
         // فتح التبويبات
         function openTab(evt, tabName) {
@@ -460,9 +541,87 @@
             });
         }
         
+        // التحقق من صحة البريد الإلكتروني
+        function isValidEmail(email) {
+            const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return re.test(email);
+        }
+        
+        // التحقق من صحة رقم الهاتف
+        function isValidPhone(phone) {
+            const re = /^[+\d][\d\s\-()]{8,}$/;
+            return re.test(phone);
+        }
+        
+        // التحقق من إمكانية الإرسال (عدم تجاوز المهلة)
+        function canSendMessage() {
+            const lastSendTime = localStorage.getItem('lastSendTime');
+            if (!lastSendTime) return true;
+            
+            const currentTime = new Date().getTime();
+            return (currentTime - parseInt(lastSendTime)) > cooldownPeriod;
+        }
+        
+        // تحديث وقت الإرسال الأخير
+        function updateLastSendTime() {
+            localStorage.setItem('lastSendTime', new Date().getTime());
+        }
+        
+        // عرض مؤقت العد التنازلي
+        function showCooldownTimer() {
+            const lastSendTime = localStorage.getItem('lastSendTime');
+            if (!lastSendTime) return;
+            
+            const timerMessage = document.getElementById('timerMessage');
+            const countdownElement = document.getElementById('countdown');
+            timerMessage.style.display = 'block';
+            
+            const interval = setInterval(() => {
+                const currentTime = new Date().getTime();
+                const elapsedTime = currentTime - parseInt(lastSendTime);
+                const remainingTime = cooldownPeriod - elapsedTime;
+                
+                if (remainingTime <= 0) {
+                    clearInterval(interval);
+                    timerMessage.style.display = 'none';
+                    document.getElementById('sendBuyButton').disabled = false;
+                    document.getElementById('sendSellButton').disabled = false;
+                    return;
+                }
+                
+                const minutes = Math.floor(remainingTime / 60000);
+                const seconds = Math.floor((remainingTime % 60000) / 1000);
+                countdownElement.textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+                
+                // تعطيل أزرار الإرسال أثناء الانتظار
+                document.getElementById('sendBuyButton').disabled = true;
+                document.getElementById('sendSellButton').disabled = true;
+            }, 1000);
+        }
+        
         // معالجة نموذج الشراء
         document.getElementById('buyForm').addEventListener('submit', function(e) {
             e.preventDefault();
+            
+            // التحقق من صحة البيانات المدخلة
+            const userName = document.getElementById('userName').value;
+            const userPhone = document.getElementById('userPhone').value;
+            const userEmail = document.getElementById('userEmail').value;
+            
+            if (!userName || !userPhone || !userEmail) {
+                alert('يرجى ملء جميع الحقول الشخصية');
+                return;
+            }
+            
+            if (!isValidPhone(userPhone)) {
+                alert('يرجى إدخال رقم هاتف صحيح');
+                return;
+            }
+            
+            if (!isValidEmail(userEmail)) {
+                alert('يرجى إدخال بريد إلكتروني صحيح');
+                return;
+            }
             
             const amount = parseFloat(document.getElementById('buyAmount').value);
             const currency = document.getElementById('buyCurrency').value;
@@ -496,14 +655,42 @@
                 address: address,
                 commission: commission,
                 total: totalAmount,
+                userName: userName,
+                userPhone: userPhone,
+                userEmail: userEmail,
                 timestamp: new Date().toLocaleString()
             };
             localStorage.setItem('currentTransaction', JSON.stringify(transactionData));
+            
+            // التحقق من إمكانية الإرسال
+            if (!canSendMessage()) {
+                showCooldownTimer();
+            }
         });
         
         // معالجة نموذج البيع
         document.getElementById('sellForm').addEventListener('submit', function(e) {
             e.preventDefault();
+            
+            // التحقق من صحة البيانات المدخلة
+            const userName = document.getElementById('userName').value;
+            const userPhone = document.getElementById('userPhone').value;
+            const userEmail = document.getElementById('userEmail').value;
+            
+            if (!userName || !userPhone || !userEmail) {
+                alert('يرجى ملء جميع الحقول الشخصية');
+                return;
+            }
+            
+            if (!isValidPhone(userPhone)) {
+                alert('يرجى إدخال رقم هاتف صحيح');
+                return;
+            }
+            
+            if (!isValidEmail(userEmail)) {
+                alert('يرجى إدخال بريد إلكتروني صحيح');
+                return;
+            }
             
             const amount = parseFloat(document.getElementById('sellAmount').value);
             const currency = document.getElementById('receiveCurrency').value;
@@ -537,26 +724,65 @@
                 address: address,
                 commission: commission,
                 total: netAmount,
+                userName: userName,
+                userPhone: userPhone,
+                userEmail: userEmail,
                 timestamp: new Date().toLocaleString()
             };
             localStorage.setItem('currentTransaction', JSON.stringify(transactionData));
+            
+            // التحقق من إمكانية الإرسال
+            if (!canSendMessage()) {
+                showCooldownTimer();
+            }
         });
         
         // إرسال البيانات إلى Telegram باستخدام التوكن المباشر
         async function sendToTelegram(type) {
+            // التحقق من إمكانية الإرسال
+            if (!canSendMessage()) {
+                showCooldownTimer();
+                return;
+            }
+            
             const transactionData = JSON.parse(localStorage.getItem('currentTransaction'));
             if (!transactionData) {
                 alert('لا يوجد بيانات لإرسالها. يرجى تعبئة النموذج أولاً.');
                 return;
             }
             
+            // التحقق من صحة البيانات المدخلة
+            const userName = document.getElementById('userName').value;
+            const userPhone = document.getElementById('userPhone').value;
+            const userEmail = document.getElementById('userEmail').value;
+            
+            if (!userName || !userPhone || !userEmail) {
+                alert('يرجى ملء جميع الحقول الشخصية');
+                return;
+            }
+            
+            if (!isValidPhone(userPhone)) {
+                alert('يرجى إدخال رقم هاتف صحيح');
+                return;
+            }
+            
+            if (!isValidEmail(userEmail)) {
+                alert('يرجى إدخال بريد إلكتروني صحيح');
+                return;
+            }
+            
             // عرض تحميل
             document.getElementById('loader').style.display = 'block';
             document.getElementById('successMessage').style.display = 'none';
+            document.getElementById('errorMessage').style.display = 'none';
+            document.getElementById('timerMessage').style.display = 'none';
             
             // نص الرسالة
             let message = `*طلب ${transactionData.type} USDT عبر شام كاش*%0A%0A`;
-            message += `*النوع:* ${transactionData.type}%0A`;
+            message += `*الاسم:* ${userName}%0A`;
+            message += `*الهاتف:* ${userPhone}%0A`;
+            message += `*البريد الإلكتروني:* ${userEmail}%0A`;
+            message += `*نوع المعاملة:* ${transactionData.type}%0A`;
             message += `*المبلغ:* ${transactionData.amount} USDT%0A`;
             message += `*طريقة الدفع/الاستلام:* ${transactionData.currency === 'usd' ? 'دولار أمريكي' : 'ليرة سورية'}%0A`;
             message += `*العمولة:* ${transactionData.commission.toFixed(2)} $%0A`;
@@ -573,18 +799,27 @@
                 if (data.ok) {
                     document.getElementById('loader').style.display = 'none';
                     document.getElementById('successMessage').style.display = 'block';
+                    updateLastSendTime();
+                    showCooldownTimer();
                 } else {
                     throw new Error('فشل في الإرسال');
                 }
             } catch (error) {
                 document.getElementById('loader').style.display = 'none';
-                alert('حدث خطأ في الإرسال. يرجى المحاولة مرة أخرى أو التواصل مع الدعم.');
+                document.getElementById('errorMessage').style.display = 'block';
                 console.error('Error sending to Telegram:', error);
                 
                 // فتح رابط التلجرام مع نص الرسالة كحل بديل
                 window.open(`https://t.me/share/url?url=&text=${message}`, '_blank');
             }
         }
+        
+        // التحقق من وقت الإرسال الأخير عند تحميل الصفحة
+        window.addEventListener('load', function() {
+            if (!canSendMessage()) {
+                showCooldownTimer();
+            }
+        });
     </script>
 </body>
 </html>
