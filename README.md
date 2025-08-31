@@ -31,7 +31,7 @@
         }
         
         .container {
-            max-width: 380px;
+            max-width: 800px;
             margin: 0 auto;
             padding: 10px;
         }
@@ -278,6 +278,16 @@
             border-right: 4px solid #ddd;
         }
         
+        .auto-send-notice {
+            background-color: #e8f6f3;
+            padding: 10px;
+            border-radius: 8px;
+            margin: 10px 0;
+            text-align: center;
+            font-size: 14px;
+            border-right: 4px solid #27ae60;
+        }
+        
         /* تحسينات للجوال */
         @media (max-width: 480px) {
             .container {
@@ -401,6 +411,10 @@
                 </form>
                 
                 <div id="buyResult" class="result">
+                    <div class="auto-send-notice">
+                        <i class="fas fa-paper-plane"></i> سيتم إرسال التقرير تلقائياً إلى مجموعة التلجرام
+                    </div>
+                    
                     <h3><i class="fas fa-file-invoice-dollar"></i> تفاصيل عملية الشراء</h3>
                     <p>المبلغ المراد شراءه: <span id="resultBuyAmount"></span> USDT</p>
                     <p>العمولة: <span id="buyCommission"></span></p>
@@ -416,10 +430,6 @@
                             <a href="https://t.me/ali0619000" class="telegram-link" target="_blank">@ali0619000</a>
                         </p>
                     </div>
-                    
-                    <button id="sendBuyButton" onclick="sendToTelegram('buy')" style="margin-top: 12px; background: linear-gradient(135deg, #0088cc, #005c8a);">
-                        <i class="fab fa-telegram"></i> إرسال الطلب إلى Telegram
-                    </button>
                 </div>
             </div>
             
@@ -448,6 +458,10 @@
                 </form>
                 
                 <div id="sellResult" class="result">
+                    <div class="auto-send-notice">
+                        <i class="fas fa-paper-plane"></i> سيتم إرسال التقرير تلقائياً إلى مجموعة التلجرام
+                    </div>
+                    
                     <h3><i class="fas fa-file-invoice-dollar"></i> تفاصيل عملية البيع</h3>
                     <p>المبلغ المراد بيعه: <span id="resultSellAmount"></span> USDT</p>
                     <p>العمولة: <span id="sellCommission"></span></p>
@@ -464,10 +478,6 @@
                         </p>
                         <p><i class="fas fa-clock"></i> سيتم إرسال المبلغ خلال عدة دقائق بعد التأكد من التحويل.</p>
                     </div>
-                    
-                    <button id="sendSellButton" onclick="sendToTelegram('sell')" style="margin-top: 12px; background: linear-gradient(135deg, #0088cc, #005c8a);">
-                        <i class="fab fa-telegram"></i> إرسال الطلب إلى Telegram
-                    </button>
                 </div>
             </div>
         </div>
@@ -478,7 +488,7 @@
         
         <div class="loader" id="loader"></div>
         <div class="success-message" id="successMessage">
-            <i class="fas fa-check-circle"></i> تم إرسال الطلب بنجاح إلى المجموعة!
+            <i class="fas fa-check-circle"></i> تم إرسال التقرير بنجاح إلى مجموعة التلجرام!
         </div>
         
         <div class="error-message" id="errorMessage">
@@ -491,7 +501,7 @@
         
         <footer>
             <p><i class="fas fa-headset"></i> لأي استفسار، يرجى التواصل مع الدعم على Telegram: <a href="https://t.me/ali0619000" class="telegram-link" target="_blank">@ali0619000</a></p>
-            <p><i class="fab fa-telegram"></i> سيتم إرسال التفاصيل إلى مجموعة Telegram: <a href="https://t.me/shamcashusdt1" class="telegram-link" target="_blank">@shamcashusdt1</a></p>
+            <p><i class="fab fa-telegram"></i> يتم إرسال التقارير تلقائياً إلى مجموعة Telegram: <a href="https://t.me/shamcashusdt1" class="telegram-link" target="_blank">@shamcashusdt1</a></p>
         </footer>
     </div>
 
@@ -583,23 +593,67 @@
                 if (remainingTime <= 0) {
                     clearInterval(interval);
                     timerMessage.style.display = 'none';
-                    document.getElementById('sendBuyButton').disabled = false;
-                    document.getElementById('sendSellButton').disabled = false;
                     return;
                 }
                 
                 const minutes = Math.floor(remainingTime / 60000);
                 const seconds = Math.floor((remainingTime % 60000) / 1000);
                 countdownElement.textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
-                
-                // تعطيل أزرار الإرسال أثناء الانتظار
-                document.getElementById('sendBuyButton').disabled = true;
-                document.getElementById('sendSellButton').disabled = true;
             }, 1000);
         }
         
+        // إرسال البيانات إلى Telegram باستخدام التوكن المباشر
+        async function sendToTelegram(transactionData) {
+            // التحقق من إمكانية الإرسال
+            if (!canSendMessage()) {
+                showCooldownTimer();
+                return false;
+            }
+            
+            // عرض تحميل
+            document.getElementById('loader').style.display = 'block';
+            document.getElementById('successMessage').style.display = 'none';
+            document.getElementById('errorMessage').style.display = 'none';
+            document.getElementById('timerMessage').style.display = 'none';
+            
+            // نص الرسالة
+            let message = `*طلب ${transactionData.type} USDT عبر شام كاش*%0A%0A`;
+            message += `*الاسم:* ${transactionData.userName}%0A`;
+            message += `*الهاتف:* ${transactionData.userPhone}%0A`;
+            message += `*البريد الإلكتروني:* ${transactionData.userEmail}%0A`;
+            message += `*نوع المعاملة:* ${transactionData.type}%0A`;
+            message += `*المبلغ:* ${transactionData.amount} USDT%0A`;
+            message += `*طريقة الدفع/الاستلام:* ${transactionData.currency === 'usd' ? 'دولار أمريكي' : 'ليرة سورية'}%0A`;
+            message += `*العمولة:* ${transactionData.commission.toFixed(2)} $%0A`;
+            message += `*المبلغ الإجمالي:* ${transactionData.total} ${transactionData.currency === 'usd' ? '$' : 'SYP'}%0A`;
+            message += `*العنوان:* ${transactionData.address}%0A`;
+            message += `*الوقت:* ${transactionData.timestamp}%0A%0A`;
+            message += `*رسالة تذكير:* عند تحويل المبلغ سوف يتم اعتماد سعر صرف الدولار كما هو سعر الصرف في البنك المركزي.`;
+            
+            try {
+                // إرسال الطلب إلى مجموعة التلجرام باستخدام API
+                const response = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${message}&parse_mode=Markdown`);
+                const data = await response.json();
+                
+                if (data.ok) {
+                    document.getElementById('loader').style.display = 'none';
+                    document.getElementById('successMessage').style.display = 'block';
+                    updateLastSendTime();
+                    showCooldownTimer();
+                    return true;
+                } else {
+                    throw new Error('فشل في الإرسال');
+                }
+            } catch (error) {
+                document.getElementById('loader').style.display = 'none';
+                document.getElementById('errorMessage').style.display = 'block';
+                console.error('Error sending to Telegram:', error);
+                return false;
+            }
+        }
+        
         // معالجة نموذج الشراء
-        document.getElementById('buyForm').addEventListener('submit', function(e) {
+        document.getElementById('buyForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
             // التحقق من صحة البيانات المدخلة
@@ -659,16 +713,13 @@
                 userEmail: userEmail,
                 timestamp: new Date().toLocaleString()
             };
-            localStorage.setItem('currentTransaction', JSON.stringify(transactionData));
             
-            // التحقق من إمكانية الإرسال
-            if (!canSendMessage()) {
-                showCooldownTimer();
-            }
+            // إرسال التقرير تلقائياً إلى Telegram
+            await sendToTelegram(transactionData);
         });
         
         // معالجة نموذج البيع
-        document.getElementById('sellForm').addEventListener('submit', function(e) {
+        document.getElementById('sellForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
             // التحقق من صحة البيانات المدخلة
@@ -728,90 +779,10 @@
                 userEmail: userEmail,
                 timestamp: new Date().toLocaleString()
             };
-            localStorage.setItem('currentTransaction', JSON.stringify(transactionData));
             
-            // التحقق من إمكانية الإرسال
-            if (!canSendMessage()) {
-                showCooldownTimer();
-            }
+            // إرسال التقرير تلقائياً إلى Telegram
+            await sendToTelegram(transactionData);
         });
-        
-        // إرسال البيانات إلى Telegram باستخدام التوكن المباشر
-        async function sendToTelegram(type) {
-            // التحقق من إمكانية الإرسال
-            if (!canSendMessage()) {
-                showCooldownTimer();
-                return;
-            }
-            
-            const transactionData = JSON.parse(localStorage.getItem('currentTransaction'));
-            if (!transactionData) {
-                alert('لا يوجد بيانات لإرسالها. يرجى تعبئة النموذج أولاً.');
-                return;
-            }
-            
-            // التحقق من صحة البيانات المدخلة
-            const userName = document.getElementById('userName').value;
-            const userPhone = document.getElementById('userPhone').value;
-            const userEmail = document.getElementById('userEmail').value;
-            
-            if (!userName || !userPhone || !userEmail) {
-                alert('يرجى ملء جميع الحقول الشخصية');
-                return;
-            }
-            
-            if (!isValidPhone(userPhone)) {
-                alert('يرجى إدخال رقم هاتف صحيح');
-                return;
-            }
-            
-            if (!isValidEmail(userEmail)) {
-                alert('يرجى إدخال بريد إلكتروني صحيح');
-                return;
-            }
-            
-            // عرض تحميل
-            document.getElementById('loader').style.display = 'block';
-            document.getElementById('successMessage').style.display = 'none';
-            document.getElementById('errorMessage').style.display = 'none';
-            document.getElementById('timerMessage').style.display = 'none';
-            
-            // نص الرسالة
-            let message = `*طلب ${transactionData.type} USDT عبر شام كاش*%0A%0A`;
-            message += `*الاسم:* ${userName}%0A`;
-            message += `*الهاتف:* ${userPhone}%0A`;
-            message += `*البريد الإلكتروني:* ${userEmail}%0A`;
-            message += `*نوع المعاملة:* ${transactionData.type}%0A`;
-            message += `*المبلغ:* ${transactionData.amount} USDT%0A`;
-            message += `*طريقة الدفع/الاستلام:* ${transactionData.currency === 'usd' ? 'دولار أمريكي' : 'ليرة سورية'}%0A`;
-            message += `*العمولة:* ${transactionData.commission.toFixed(2)} $%0A`;
-            message += `*المبلغ الإجمالي:* ${transactionData.total} ${transactionData.currency === 'usd' ? '$' : 'ليرة سورية'}%0A`;
-            message += `*العنوان:* ${transactionData.address}%0A`;
-            message += `*الوقت:* ${transactionData.timestamp}%0A%0A`;
-            message += `*لأي اسفسار التواصل مع الدعم @ali0619000.`;
-            
-            try {
-                // إرسال الطلب إلى مجموعة التلجرام باستخدام API
-                const response = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${message}&parse_mode=Markdown`);
-                const data = await response.json();
-                
-                if (data.ok) {
-                    document.getElementById('loader').style.display = 'none';
-                    document.getElementById('successMessage').style.display = 'block';
-                    updateLastSendTime();
-                    showCooldownTimer();
-                } else {
-                    throw new Error('فشل في الإرسال');
-                }
-            } catch (error) {
-                document.getElementById('loader').style.display = 'none';
-                document.getElementById('errorMessage').style.display = 'block';
-                console.error('Error sending to Telegram:', error);
-                
-                // فتح رابط التلجرام مع نص الرسالة كحل بديل
-                window.open(`https://t.me/share/url?url=&text=${message}`, '_blank');
-            }
-        }
         
         // التحقق من وقت الإرسال الأخير عند تحميل الصفحة
         window.addEventListener('load', function() {
