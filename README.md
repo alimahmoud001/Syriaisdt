@@ -254,6 +254,7 @@
         <header>
             <h1>بيع وشراء USDT</h1>
             <p>من خلال شام كاش -  سعر الصرف 116.00p/p>
+            <p>العمولة 1$ + 0.05% p/p>
         </header>
 
         <div class="form-container">
