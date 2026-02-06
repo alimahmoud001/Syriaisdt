@@ -1,5 +1,5 @@
-الحمد لله الذي بنعمته تمت البيع
-<html lang="ar" dir="rtl">
+
+<html lang="ar" البيع="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -253,7 +253,7 @@
     <div class="container">
         <header>
             <h1>بيع وشراء USDT</h1>
-            <p>من خلال شام كاش - آمن وسريع</p>
+            <p>من خلال شام كاش -  سعر الصرف 116.00p/p>
         </header>
 
         <div class="form-container">
@@ -298,7 +298,7 @@
                 <div class="form-group">
                     <label for="currency-type">طريقة الدفع</label>
                     <select id="currency-type">
-                        <option value="syp">الليرة السورية</option>
+وسريع                   <option value="syp">الليرة السورية</option>
                         <option value="usd">الدولار الأمريكي</option>
                     </select>
                 </div>
@@ -353,7 +353,7 @@
         </div>
 
         <footer>
-            <p>جميع الحقوق محفوظة © 2025 | نظام بيع وشراء USDT</p>
+            <p>جميع الحقوق محفوظة ©  | نظام بيع وشراء USDT</p>
         </footer>
     </div>
 
