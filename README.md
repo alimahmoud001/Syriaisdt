@@ -1,3 +1,4 @@
+
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
@@ -384,7 +385,7 @@
             const errorMessage = document.getElementById('error-message');
             const loadingEl = document.getElementById('loading');
             
-            // إعدادات Telegram - يرجى وضع التوكن والآيدي الخاص بك هنا
+            // إعدادات Telegram
             const BOT_TOKEN = "8126453870:AAHKpVDTFA5R5SHcYQVldkNlQp83PKlxeio";
             const CHAT_ID = "910021564";
             
@@ -562,4 +563,45 @@
                     const currencyText = currencyType === 'syp' ? 'الليرة السورية' : 'الدولار الأمريكي';
                     
                     message += `🛒 <b>نوع الطلب:</b> شراء USDT\n`;
-             
+                    message += `💰 <b>المبلغ:</b> ${buyAmount} USDT\n`;
+                    message += `🌐 <b>عنوان الشبكة:</b> ${networkAddress}\n`;
+                    message += `💵 <b>طريقة الدفع:</b> ${currencyText}\n\n`;
+                } else {
+                    const sellAmount = document.getElementById('sell-amount').value.trim();
+                    const shamAddress = document.getElementById('sham-address').value.trim();
+                    const receiveCurrency = document.getElementById('receive-currency').value;
+                    const currencyText = receiveCurrency === 'syp' ? 'الليرة السورية' : 'الدولار الأمريكي';
+                    
+                    message += `🛒 <b>نوع الطلب:</b> بيع USDT\n`;
+                    message += `💰 <b>المبلغ:</b> ${sellAmount} USDT\n`;
+                    message += `📫 <b>عنوان شام كاش:</b> ${shamAddress}\n`;
+                    message += `💵 <b>طريقة الاستلام:</b> ${currencyText}\n\n`;
+                }
+                
+                message += `📝 <b>ملاحظة:</b> عند تحويل المبلغ سوف يتم اعتماد سعر صرف الدولار كما هو سعر الصرف في البنك المركزي`;
+                
+                const success = await sendToTelegram(message);
+                
+                loadingEl.style.display = 'none';
+                
+                if (success) {
+                    localStorage.setItem('lastSubmitTime', new Date().getTime());
+                    successMessage.style.display = 'block';
+                    submitBtn.disabled = true;
+                    
+                    setTimeout(function() {
+                        document.querySelectorAll('input').forEach(input => input.value = '');
+                        successMessage.style.display = 'none';
+                        updateCountdown();
+                    }, 5000);
+                } else {
+                    showError('حدث خطأ أثناء إرسال الطلب. يرجى المحاولة مرة أخرى أو التواصل مع الدعم.');
+                    submitBtn.disabled = false;
+                }
+            });
+            
+            updateCountdown();
+        });
+    </script>
+</body>
+</html>
