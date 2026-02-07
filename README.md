@@ -262,7 +262,7 @@
         <header>
             <h1>بيع وشراء USDT</h1>
             <p>من خلال شام كاش - سعر الصرف 116.00</p>
-            <p>العمولة 1$ + 0.05%</p>
+            <p>العمولة 1$ + 0.5%</p>
         </header>
 
         <div class="form-container">
@@ -342,18 +342,14 @@
 
                 <div class="note">
                     <h4>معلومات التحويل</h4>
-                    <p>يرجى التحويل إلى العنوان التالي:</p>
+                    <p>يرجى التحويل إلى العنوان التالي عبر شبكة bep20 حصرا :</p>
                     <div class="address-box" onclick="copyToClipboard('0x2F1A184B6abBb49De547D539eDC3b5eAdc3E01F9')">0x2F1A184B6abBb49De547D539eDC3b5eAdc3E01F9</div>
                     <p>بعد التحويل، يرجى إرسال صورة لقطة الشاشة إلى الدعم على Telegram: <a href="https://t.me/ali0619000" target="_blank">@ali0619000</a></p>
                     <p>سيتم إرسال المبلغ خلال عدة دقائق بعد التأكيد</p>
                 </div>
             </div>
 
-            <div class="note">
-                <h4>ملاحظة هامة</h4>
-                <p>عند تحويل المبلغ سوف يتم اعتماد سعر صرف الدولار كما هو سعر الصرف في البنك المركزي</p>
-            </div>
-
+            
             <button type="submit" class="submit-btn" id="submit-btn">إرسال الطلب</button>
             <div class="countdown" id="countdown"></div>
             <div class="success-message" id="success-message">
