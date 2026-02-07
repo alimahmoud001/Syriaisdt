@@ -143,6 +143,30 @@
             to { opacity: 1; }
         }
         
+        .calculation-box {
+            background: #eef4ff;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border: 1px solid #d0e1ff;
+        }
+
+        .calc-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-size: 13px;
+        }
+
+        .calc-row.total {
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #d0e1ff;
+            font-weight: bold;
+            font-size: 15px;
+            color: #1e488c;
+        }
+        
         .address-box {
             background: #f8f9fa;
             padding: 15px;
@@ -261,8 +285,6 @@
     <div class="container">
         <header>
             <h1>بيع وشراء USDT</h1>
-            <p>من خلال شام كاش - سعر الصرف 116.00</p>
-            <p>العمولة 1$ + 0.5%</p>
         </header>
 
         <div class="form-container">
@@ -282,11 +304,6 @@
                 <input type="tel" id="phone" placeholder="أدخل رقم هاتفك">
             </div>
 
-            <div class="form-group">
-                <label for="email">البريد الإلكتروني</label>
-                <input type="email" id="email" placeholder="أدخل بريدك الإلكتروني">
-            </div>
-
             <div class="transaction-type">
                 <button type="button" id="buy-btn" class="active">شراء USDT</button>
                 <button type="button" id="sell-btn">بيع USDT</button>
@@ -296,7 +313,7 @@
             <div id="buy-section" class="buy-section active">
                 <div class="form-group">
                     <label for="buy-amount">المبلغ المراد شراؤه (USDT)</label>
-                    <input type="number" id="buy-amount" placeholder="أدخل المبلغ بالUSDT">
+                    <input type="number" id="buy-amount" placeholder="أدخل المبلغ بالUSDT" step="0.01">
                 </div>
 
                 <div class="form-group">
@@ -312,6 +329,21 @@
                     </select>
                 </div>
 
+                <div class="calculation-box" id="buy-calc-box" style="display:none;">
+                    <div class="calc-row">
+                        <span>المبلغ الأساسي:</span>
+                        <span id="buy-base-display">0 USDT</span>
+                    </div>
+                    <div class="calc-row">
+                        <span>العمولة (1$ + 0.5%):</span>
+                        <span id="buy-fee-display">0 USDT</span>
+                    </div>
+                    <div class="calc-row total">
+                        <span>المبلغ المطلوب دفعه:</span>
+                        <span id="buy-total-display">0</span>
+                    </div>
+                </div>
+
                 <div class="note">
                     <h4>معلومات الدفع</h4>
                     <p>يرجى التحويل إلى عنوان شام كاش التالي:</p>
@@ -324,7 +356,7 @@
             <div id="sell-section" class="sell-section">
                 <div class="form-group">
                     <label for="sell-amount">المبلغ المراد بيعه (USDT)</label>
-                    <input type="number" id="sell-amount" placeholder="أدخل المبلغ بالUSDT">
+                    <input type="number" id="sell-amount" placeholder="أدخل المبلغ بالUSDT" step="0.01">
                 </div>
 
                 <div class="form-group">
@@ -340,16 +372,30 @@
                     </select>
                 </div>
 
+                <div class="calculation-box" id="sell-calc-box" style="display:none;">
+                    <div class="calc-row">
+                        <span>المبلغ الأساسي:</span>
+                        <span id="sell-base-display">0 USDT</span>
+                    </div>
+                    <div class="calc-row">
+                        <span>العمولة (1$ + 0.5%):</span>
+                        <span id="sell-fee-display">0 USDT</span>
+                    </div>
+                    <div class="calc-row total">
+                        <span>المبلغ الذي ستستلمه:</span>
+                        <span id="sell-total-display">0</span>
+                    </div>
+                </div>
+
                 <div class="note">
                     <h4>معلومات التحويل</h4>
-                    <p>يرجى التحويل إلى العنوان التالي عبر شبكة bep20 حصرا :</p>
+                    <p>يرجى التحويل إلى العنوان التالي:</p>
                     <div class="address-box" onclick="copyToClipboard('0x2F1A184B6abBb49De547D539eDC3b5eAdc3E01F9')">0x2F1A184B6abBb49De547D539eDC3b5eAdc3E01F9</div>
                     <p>بعد التحويل، يرجى إرسال صورة لقطة الشاشة إلى الدعم على Telegram: <a href="https://t.me/ali0619000" target="_blank">@ali0619000</a></p>
                     <p>سيتم إرسال المبلغ خلال عدة دقائق بعد التأكيد</p>
                 </div>
             </div>
 
-            
             <button type="submit" class="submit-btn" id="submit-btn">إرسال الطلب</button>
             <div class="countdown" id="countdown"></div>
             <div class="success-message" id="success-message">
@@ -363,7 +409,10 @@
     </div>
 
     <script>
-        // وظيفة نسخ النص
+        const EXCHANGE_RATE = 116.00;
+        const FIXED_FEE = 1.0;
+        const PERCENT_FEE = 0.005; // 0.5%
+
         function copyToClipboard(text) {
             navigator.clipboard.writeText(text).then(() => {
                 alert('تم نسخ العنوان بنجاح');
@@ -381,16 +430,76 @@
             const errorMessage = document.getElementById('error-message');
             const loadingEl = document.getElementById('loading');
             
+            const buyAmountInput = document.getElementById('buy-amount');
+            const buyCurrencySelect = document.getElementById('currency-type');
+            const sellAmountInput = document.getElementById('sell-amount');
+            const sellCurrencySelect = document.getElementById('receive-currency');
+
             // إعدادات Telegram
             const BOT_TOKEN = "8126453870:AAHKpVDTFA5R5SHcYQVldkNlQp83PKlxeio";
             const CHAT_ID = "910021564";
             
-            // التبديل بين شراء وبيع
+            function calculateBuy() {
+                const amount = parseFloat(buyAmountInput.value) || 0;
+                const calcBox = document.getElementById('buy-calc-box');
+                
+                if (amount > 0) {
+                    calcBox.style.display = 'block';
+                    const fee = FIXED_FEE + (amount * PERCENT_FEE);
+                    const totalUSDT = amount + fee;
+                    
+                    document.getElementById('buy-base-display').textContent = amount.toFixed(2) + ' USDT';
+                    document.getElementById('buy-fee-display').textContent = fee.toFixed(2) + ' USDT';
+                    
+                    if (buyCurrencySelect.value === 'syp') {
+                        const totalSYP = totalUSDT * EXCHANGE_RATE;
+                        document.getElementById('buy-total-display').textContent = totalSYP.toLocaleString() + ' ليرة سورية';
+                    } else {
+                        document.getElementById('buy-total-display').textContent = totalUSDT.toFixed(2) + ' دولار أمريكي';
+                    }
+                } else {
+                    calcBox.style.display = 'none';
+                }
+            }
+
+            function calculateSell() {
+                const amount = parseFloat(sellAmountInput.value) || 0;
+                const calcBox = document.getElementById('sell-calc-box');
+                
+                if (amount > 0) {
+                    calcBox.style.display = 'block';
+                    const fee = FIXED_FEE + (amount * PERCENT_FEE);
+                    const totalUSDT = amount - fee;
+                    
+                    document.getElementById('sell-base-display').textContent = amount.toFixed(2) + ' USDT';
+                    document.getElementById('sell-fee-display').textContent = fee.toFixed(2) + ' USDT';
+                    
+                    if (totalUSDT > 0) {
+                        if (sellCurrencySelect.value === 'syp') {
+                            const totalSYP = totalUSDT * EXCHANGE_RATE;
+                            document.getElementById('sell-total-display').textContent = totalSYP.toLocaleString() + ' ليرة سورية';
+                        } else {
+                            document.getElementById('sell-total-display').textContent = totalUSDT.toFixed(2) + ' دولار أمريكي';
+                        }
+                    } else {
+                        document.getElementById('sell-total-display').textContent = 'المبلغ صغير جداً لتغطية العمولة';
+                    }
+                } else {
+                    calcBox.style.display = 'none';
+                }
+            }
+
+            buyAmountInput.addEventListener('input', calculateBuy);
+            buyCurrencySelect.addEventListener('change', calculateBuy);
+            sellAmountInput.addEventListener('input', calculateSell);
+            sellCurrencySelect.addEventListener('change', calculateSell);
+
             buyBtn.addEventListener('click', function() {
                 buyBtn.classList.add('active');
                 sellBtn.classList.remove('active');
                 buySection.classList.add('active');
                 sellSection.classList.remove('active');
+                calculateBuy();
             });
             
             sellBtn.addEventListener('click', function() {
@@ -398,35 +507,29 @@
                 buyBtn.classList.remove('active');
                 sellSection.classList.add('active');
                 buySection.classList.remove('active');
+                calculateSell();
             });
             
-            // التحقق من الوقت بين الطلبات
             function canSubmit() {
                 const lastSubmitTime = localStorage.getItem('lastSubmitTime');
                 if (!lastSubmitTime) return true;
-                
                 const currentTime = new Date().getTime();
-                const tenMinutes = 10 * 60 * 1000; // 10 دقائق
-                
+                const tenMinutes = 10 * 60 * 1000;
                 return (currentTime - lastSubmitTime) > tenMinutes;
             }
             
             function updateCountdown() {
                 const lastSubmitTime = localStorage.getItem('lastSubmitTime');
                 if (!lastSubmitTime) return;
-                
                 const currentTime = new Date().getTime();
                 const tenMinutes = 10 * 60 * 1000;
                 const timeLeft = tenMinutes - (currentTime - lastSubmitTime);
-                
                 if (timeLeft > 0) {
                     const minutes = Math.floor(timeLeft / 60000);
                     const seconds = Math.floor((timeLeft % 60000) / 1000);
-                    
                     countdownEl.style.display = 'block';
                     countdownEl.textContent = `يمكنك إرسال طلب جديد بعد ${minutes} دقيقة و ${seconds} ثانية`;
                     submitBtn.disabled = true;
-                    
                     setTimeout(updateCountdown, 1000);
                 } else {
                     countdownEl.style.display = 'none';
@@ -435,61 +538,25 @@
                 }
             }
             
-            // التحقق من صحة البيانات
             function validateForm() {
                 const name = document.getElementById('name').value.trim();
                 const phone = document.getElementById('phone').value.trim();
-                const email = document.getElementById('email').value.trim();
-                
-                if (!name) {
-                    showError('يرجى إدخال الاسم بالكامل');
-                    return false;
-                }
-                
-                if (!phone) {
-                    showError('يرجى إدخال رقم الهاتف');
-                    return false;
-                }
-                
-                if (!email) {
-                    showError('يرجى إدخال البريد الإلكتروني');
-                    return false;
-                }
-                
-                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                if (!emailRegex.test(email)) {
-                    showError('يرجى إدخال بريد إلكتروني صحيح');
-                    return false;
-                }
+                if (!name) { showError('يرجى إدخال الاسم بالكامل'); return false; }
+                if (!phone) { showError('يرجى إدخال رقم الهاتف'); return false; }
                 
                 if (buySection.classList.contains('active')) {
-                    const buyAmount = document.getElementById('buy-amount').value.trim();
+                    const buyAmount = parseFloat(buyAmountInput.value);
                     const networkAddress = document.getElementById('network-address').value.trim();
-                    
-                    if (!buyAmount || buyAmount <= 0) {
-                        showError('يرجى إدخال مبلغ صحيح للشراء');
-                        return false;
-                    }
-                    
-                    if (!networkAddress) {
-                        showError('يرجى إدخال عنوان الشبكة');
-                        return false;
-                    }
+                    if (!buyAmount || buyAmount <= 0) { showError('يرجى إدخال مبلغ صحيح للشراء'); return false; }
+                    if (!networkAddress) { showError('يرجى إدخال عنوان الشبكة'); return false; }
                 } else {
-                    const sellAmount = document.getElementById('sell-amount').value.trim();
+                    const sellAmount = parseFloat(sellAmountInput.value);
                     const shamAddress = document.getElementById('sham-address').value.trim();
-                    
-                    if (!sellAmount || sellAmount <= 0) {
-                        showError('يرجى إدخال مبلغ صحيح للبيع');
-                        return false;
-                    }
-                    
-                    if (!shamAddress) {
-                        showError('يرجى إدخال عنوان شام كاش');
-                        return false;
-                    }
+                    if (!sellAmount || sellAmount <= 0) { showError('يرجى إدخال مبلغ صحيح للبيع'); return false; }
+                    const fee = FIXED_FEE + (sellAmount * PERCENT_FEE);
+                    if (sellAmount <= fee) { showError('المبلغ يجب أن يكون أكبر من العمولة'); return false; }
+                    if (!shamAddress) { showError('يرجى إدخال عنوان شام كاش'); return false; }
                 }
-                
                 hideError();
                 return true;
             }
@@ -500,98 +567,76 @@
                 setTimeout(hideError, 5000);
             }
             
-            function hideError() {
-                errorMessage.style.display = 'none';
-            }
+            function hideError() { errorMessage.style.display = 'none'; }
             
-            // إرسال الرسالة إلى Telegram
             async function sendToTelegram(message) {
                 const apiUrl = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
-                
                 try {
                     const response = await fetch(apiUrl, {
                         method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            chat_id: CHAT_ID,
-                            text: message,
-                            parse_mode: 'HTML'
-                        })
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ chat_id: CHAT_ID, text: message, parse_mode: 'HTML' })
                     });
-                    
                     const data = await response.json();
                     return data.ok;
-                } catch (error) {
-                    console.error('Error sending message:', error);
-                    return false;
-                }
+                } catch (error) { return false; }
             }
             
-            // إرسال الطلب
             submitBtn.addEventListener('click', async function() {
-                if (!canSubmit()) {
-                    updateCountdown();
-                    return;
-                }
-                
-                if (!validateForm()) {
-                    return;
-                }
+                if (!canSubmit()) { updateCountdown(); return; }
+                if (!validateForm()) return;
                 
                 loadingEl.style.display = 'block';
                 submitBtn.disabled = true;
                 
                 const name = document.getElementById('name').value.trim();
                 const phone = document.getElementById('phone').value.trim();
-                const email = document.getElementById('email').value.trim();
                 
                 let message = `<b>طلب جديد</b>\n`;
                 message += `👤 <b>الاسم:</b> ${name}\n`;
-                message += `📞 <b>الهاتف:</b> ${phone}\n`;
-                message += `📧 <b>البريد الإلكتروني:</b> ${email}\n\n`;
+                message += `📞 <b>الهاتف:</b> ${phone}\n\n`;
                 
                 if (buySection.classList.contains('active')) {
-                    const buyAmount = document.getElementById('buy-amount').value.trim();
-                    const networkAddress = document.getElementById('network-address').value.trim();
-                    const currencyType = document.getElementById('currency-type').value;
-                    const currencyText = currencyType === 'syp' ? 'الليرة السورية' : 'الدولار الأمريكي';
+                    const amount = parseFloat(buyAmountInput.value);
+                    const fee = FIXED_FEE + (amount * PERCENT_FEE);
+                    const totalUSDT = amount + fee;
+                    const currencyType = buyCurrencySelect.value;
+                    const totalFinal = currencyType === 'syp' ? (totalUSDT * EXCHANGE_RATE).toLocaleString() + ' ليرة' : totalUSDT.toFixed(2) + ' $';
                     
                     message += `🛒 <b>نوع الطلب:</b> شراء USDT\n`;
-                    message += `💰 <b>المبلغ:</b> ${buyAmount} USDT\n`;
-                    message += `🌐 <b>عنوان الشبكة:</b> ${networkAddress}\n`;
-                    message += `💵 <b>طريقة الدفع:</b> ${currencyText}\n\n`;
+                    message += `💰 <b>المبلغ المطلوب:</b> ${amount} USDT\n`;
+                    message += `💸 <b>العمولة:</b> ${fee.toFixed(2)} USDT\n`;
+                    message += `💵 <b>الإجمالي للدفع:</b> ${totalFinal}\n`;
+                    message += `🌐 <b>عنوان الشبكة:</b> ${document.getElementById('network-address').value}\n`;
                 } else {
-                    const sellAmount = document.getElementById('sell-amount').value.trim();
-                    const shamAddress = document.getElementById('sham-address').value.trim();
-                    const receiveCurrency = document.getElementById('receive-currency').value;
-                    const currencyText = receiveCurrency === 'syp' ? 'الليرة السورية' : 'الدولار الأمريكي';
+                    const amount = parseFloat(sellAmountInput.value);
+                    const fee = FIXED_FEE + (amount * PERCENT_FEE);
+                    const totalUSDT = amount - fee;
+                    const currencyType = sellCurrencySelect.value;
+                    const totalFinal = currencyType === 'syp' ? (totalUSDT * EXCHANGE_RATE).toLocaleString() + ' ليرة' : totalUSDT.toFixed(2) + ' $';
                     
                     message += `🛒 <b>نوع الطلب:</b> بيع USDT\n`;
-                    message += `💰 <b>المبلغ:</b> ${sellAmount} USDT\n`;
-                    message += `📫 <b>عنوان شام كاش:</b> ${shamAddress}\n`;
-                    message += `💵 <b>طريقة الاستلام:</b> ${currencyText}\n\n`;
+                    message += `💰 <b>المبلغ المرسل:</b> ${amount} USDT\n`;
+                    message += `💸 <b>العمولة:</b> ${fee.toFixed(2)} USDT\n`;
+                    message += `💵 <b>المبلغ للاستلام:</b> ${totalFinal}\n`;
+                    message += `📫 <b>عنوان شام كاش:</b> ${document.getElementById('sham-address').value}\n`;
                 }
                 
-                message += `📝 <b>ملاحظة:</b> عند تحويل المبلغ سوف يتم اعتماد سعر صرف الدولار كما هو سعر الصرف في البنك المركزي`;
-                
                 const success = await sendToTelegram(message);
-                
                 loadingEl.style.display = 'none';
                 
                 if (success) {
                     localStorage.setItem('lastSubmitTime', new Date().getTime());
                     successMessage.style.display = 'block';
-                    submitBtn.disabled = true;
-                    
                     setTimeout(function() {
                         document.querySelectorAll('input').forEach(input => input.value = '');
                         successMessage.style.display = 'none';
+                        document.getElementById('buy-calc-box').style.display = 'none';
+                        document.getElementById('sell-calc-box').style.display = 'none';
                         updateCountdown();
                     }, 5000);
                 } else {
-                    showError('حدث خطأ أثناء إرسال الطلب. يرجى المحاولة مرة أخرى أو التواصل مع الدعم.');
+                    showError('حدث خطأ أثناء إرسال الطلب.');
                     submitBtn.disabled = false;
                 }
             });
